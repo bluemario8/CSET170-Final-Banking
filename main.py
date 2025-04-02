@@ -29,6 +29,7 @@ class User(UserMixin):
 # -- HOME PAGE -- #
 # --------------- #
 
+@app.route('/', methods=['GET'])
 @app.route('/home', methods=['GET'])
 def home():
     return render_template('index.html')
