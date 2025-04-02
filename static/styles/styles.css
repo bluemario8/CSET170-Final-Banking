@@ -84,6 +84,7 @@ table, th, td{
     background-color: var(--color-white);
 }
 
+.contact,
 .address{
-    margin-top: 15px;
+    margin-top: 25px;
 }
