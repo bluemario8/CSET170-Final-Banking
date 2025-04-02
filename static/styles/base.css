@@ -8,7 +8,7 @@
     --color-dark-blue: #112250;
     --color-med-blue: #3c5070;
     --color-light-blue: #8798b4;
-    --color-yellow: #e0c58f;
+    --color-pink: #975281;
     --color-cream: #d9cbc2;
     --color-white: #f5f0e9;
     --font-main: 'Asap Condensed';
@@ -41,11 +41,13 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    text-decoration: none;
 }
 
 .logoContainer > h3{
     margin-left: 10px;
     text-transform: uppercase;
+    color: var(--color-white);
     font-size: 40px;
     font-weight: 400;
 }
@@ -72,7 +74,7 @@
 }
 
 .headerMenuItem > a:hover{
-    color: var(--color-yellow);
+    color: var(--color-pink);
 }
 
 
@@ -114,7 +116,7 @@
 }
 
 .footerMenuItem:hover{
-    color: var(--color-yellow);
+    color: var(--color-pink);
 }
 
 .footerMenuItem > .fa-brands{
@@ -124,5 +126,5 @@
 }
 
 .footerMenuItem > .fa-brands:hover{
-    color: var(--color-yellow);
+    color: var(--color-pink);
 }

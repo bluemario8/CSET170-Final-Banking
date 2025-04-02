@@ -9,6 +9,8 @@ body{
 }
 
 .page{
+    background-image: linear-gradient(#112250b3, #11225059), url(https://imageio.forbes.com/specials-images/imageserve/60eda0efdccb85252c59d7a9/0x0.jpg?format=jpg&height=900&width=1600&fit=bounds);
+    background-size: contain;
     min-height: var(--page-height);
 }
 
@@ -34,11 +36,6 @@ body{
 /* -- HOME STYLES -- */
 /* ----------------- */
 
-.home{
-    background-image: linear-gradient(#11225059, #11225059), url(https://imageio.forbes.com/specials-images/imageserve/60eda0efdccb85252c59d7a9/0x0.jpg?format=jpg&height=900&width=1600&fit=bounds);
-    background-size: contain;
-}
-
 .greeting{
     display: flex;
     flex-direction: column;
@@ -53,7 +50,7 @@ body{
     justify-content: space-between;
     margin-top: 10px;
     width: 100px;
-    color: var(--color-yellow);
+    color: var(--color-pink);
     text-decoration: none;
 }
 
