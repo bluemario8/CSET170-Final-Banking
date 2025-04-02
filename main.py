@@ -33,6 +33,18 @@ def account():
     return render_template('account.html', accounts = users, address = address)
 
 
+# ------------------ #
+# -- BALANCE PAGE -- #
+# ------------------ #
+
+@app.route('/balance', methods={'GET'})
+def balance():
+    current = getCurrentUser()
+    balance = conn.execute(text('SELECT acc_num, balance FROM users WHERE acc_num = :current'), {'current': current}).fetchone()
+    print(balance)
+    return render_template('balance.html', balance = balance)
+
+
 # --------------- #
 # -- FUNCTIONS -- # 
 # --------------- #

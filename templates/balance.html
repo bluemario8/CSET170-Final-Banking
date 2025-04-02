@@ -1,0 +1,24 @@
+<link rel="stylesheet" href="../static/styles/styles.css">
+{% extends 'base.html' %}
+{% block body %}
+<section class="page">
+    <div class="pageBody">
+        <h2 class="title">Account balance</h2>
+        <div class="accountContainer">
+            <table class="accountTable">
+                <tr class="tableRow">
+                    <th>Account number</th>
+                    <th>Balance</th>
+                </tr>
+                <tr class="tableRow">
+                    <td>{{ balance[0] }}</td>
+                    <td>{{ balance[1] }}</td>
+                </tr>
+            </table>
+        </div>
+        <div class="moneyBtnContainer">
+            <button class="send-money-btn">Send money</button>
+        </div>
+    </div>
+</section>
+{% endblock %}

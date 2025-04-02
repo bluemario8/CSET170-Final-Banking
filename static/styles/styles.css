@@ -85,3 +85,26 @@ table, th, td{
 .address{
     margin-top: 25px;
 }
+
+
+/* -- send money btn styles -- */
+
+.moneyBtnContainer{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 auto;
+    margin-top: 40px;
+    width: 80%;
+}
+
+.send-money-btn{
+    margin: 40px auto;
+    border: none;
+    border-radius: 5px;
+    background-color: var(--color-med-blue);
+    padding: 10px;
+    width: fit-content;
+    color: var(--color-white);
+    font-size: 18px;
+}
