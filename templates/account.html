@@ -11,10 +11,10 @@
                     <th>Name</th>
                     <th>Username</th>
                 </tr>
-                <tr class="tableRow">
-                    <td>Number here</td>
-                    <td>Name here</td>
-                    <td>Username here</td>
+                <tr class= "accounts tableRow">
+                    <td>{{ accounts[0] }}</td>
+                    <td>{{ accounts[1] }}</td>
+                    <td>{{ accounts[2] }}</td>
                 </tr>
             </table>
             <table class="accountTable contact">
@@ -24,7 +24,7 @@
                 </tr>
                 <tr class="tableRow">
                     <td>Email here</td>
-                    <td>Phone number here</td>
+                    <td>{{ accounts[3] }}</td>
                 </tr>
             </table>
             <table class="accountTable address">
@@ -32,7 +32,7 @@
                     <th>Address</th>
                 </tr>
                 <tr>
-                    <td>Address here</td>
+                    <td>{{ address[0] }}</td>
                 </tr>
             </table>
         </div>
