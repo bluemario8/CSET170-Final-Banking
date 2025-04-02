@@ -12,6 +12,10 @@ conn = engine.connect()                                                         
 # -- HOME PAGE -- #
 # --------------- #
 
+@app.route('/', methods=['GET'])
 @app.route('/home', methods=['GET'])
 def home():
     return render_template('index.html')
+
+if __name__ == '__main__':
+    app.run(debug=True)

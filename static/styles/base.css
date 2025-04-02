@@ -5,13 +5,14 @@
 }
 
 :root{
-    --color-1: #112250;
-    --color-2: #3c5070;
-    --color-3: #5b7194;
-    --color-4: #e0c58f;
-    --color-5: #d9cbc2;
-    --color-6: #f5f0e9;
+    --color-dark-blue: #112250;
+    --color-med-blue: #3c5070;
+    --color-light-blue: #8798b4;
+    --color-yellow: #e0c58f;
+    --color-cream: #d9cbc2;
+    --color-white: #f5f0e9;
     --font-main: 'Asap Condensed';
+    --page-height: calc(100vh - 200px);
 }
 
 
@@ -20,12 +21,12 @@
 /* ------------------- */
 
 .header{
-    background-color: var(--color-1);
+    background-color: var(--color-dark-blue);
     padding: 10px 30px;
-    height: 200px;
+    height: 100px;
     width: 100%;
     font-family: var(--font-main);
-    color: var(--color-6);
+    color: var(--color-white);
 }
 
 .headerContainer{
@@ -50,7 +51,7 @@
 }
 
 .headerLogo{
-    height: 80px;
+    height: 70px;
 }
 
 .headerMenu{
@@ -71,10 +72,9 @@
 /* ------------------- */
 
 .footer{
-    margin-top: 20px;
-    background-color: var(--color-1);
+    background-color: var(--color-dark-blue);
     padding: 10px 30px;
-    height: 200px;
+    height: 100px;
     width: 100%;
     font-family: var(--font-main);
 }
@@ -88,7 +88,7 @@
 }
 
 .legal{
-    color: var(--color-3);
+    color: var(--color-light-blue);
 }
 
 .footerMenu{
@@ -100,20 +100,20 @@
 .footerMenuItem{
     margin: 0 10px;
     text-transform: uppercase;
-    color: var(--color-6);
+    color: var(--color-white);
     font-size: 15px;
 }
 
 .footerMenuItem:hover{
-    color: var(--color-4);
+    color: var(--color-yellow);
 }
 
 .footerMenuItem > .fa-brands{
     margin: auto 10px;
-    color: var(--color-6);
+    color: var(--color-white);
     font-size: 18px;
 }
 
 .footerMenuItem > .fa-brands:hover{
-    color: var(--color-4);
+    color: var(--color-yellow);
 }
