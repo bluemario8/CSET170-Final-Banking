@@ -1,0 +1,31 @@
+<link rel="stylesheet" href="../static/styles/styles.css">
+{% extends 'base.html' %}
+{% block body %}
+<section class="page">
+    <div class="pageBody">
+        <h2 class="title">Account Information</h2>
+        <div class="accountContainer">
+            <table class="accountTable">
+                <tr class="tableRow">
+                    <th>Account number</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                </tr>
+                <tr class="tableRow">
+                    <td>Number here</td>
+                    <td>Name here</td>
+                    <td>Email here</td>
+                </tr>
+            </table>
+            <table class="accountTable address">
+                <tr>
+                    <th>Address</th>
+                </tr>
+                <tr>
+                    <td>Address here</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}

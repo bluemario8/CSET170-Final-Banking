@@ -66,6 +66,15 @@
     text-transform: uppercase;
 }
 
+.headerMenuItem > a{
+    color: var(--color-white);
+    text-decoration: none;
+}
+
+.headerMenuItem > a:hover{
+    color: var(--color-yellow);
+}
+
 
 /* ------------------- */
 /* -- FOOTER STYLES -- */

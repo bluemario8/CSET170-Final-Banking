@@ -17,5 +17,15 @@ conn = engine.connect()                                                         
 def home():
     return render_template('index.html')
 
+
+# ------------------ #
+# -- ACCOUNT PAGE -- #
+# ------------------ #
+
+@app.route('/account', methods=['GET', 'POST'])
+def account():
+    return render_template('account.html')
+
+
 if __name__ == '__main__':
     app.run(debug=True)

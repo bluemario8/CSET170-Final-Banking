@@ -56,3 +56,34 @@ body{
     color: var(--color-yellow);
     text-decoration: none;
 }
+
+
+/* -------------------- */
+/* -- ACCOUNT STYLES -- */
+/* -------------------- */
+
+.accountContainer{
+    margin: 0 auto;
+    margin-top: 40px;
+    width: 80%;
+}
+
+.accountTable{
+    width: 100%;
+    color: var(--color-med-blue);
+    font-size: 22px;
+}
+
+.tableRow > th,
+.tableRow > td{
+    width: 33%;
+}
+
+table, th, td{
+    border: 1px solid var(--color-dark-blue);
+    background-color: var(--color-white);
+}
+
+.address{
+    margin-top: 15px;
+}
