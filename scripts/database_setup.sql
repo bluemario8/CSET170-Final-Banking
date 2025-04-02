@@ -37,11 +37,24 @@ CREATE TABLE IF NOT EXISTS addresses (
 
 CREATE TABLE IF NOT EXISTS admin (
 	admin_id INT PRIMARY KEY AUTO_INCREMENT,
-    username VARCHAR(50) NOT NULL,
+    username VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(100) NOT NULL
+);
+-- If you ran the old admin table create and don't want to delete loggedin
+-- ALTER TABLE admin ADD CONSTRAINT unique_username UNIQUE (username);
+
+CREATE TABLE IF NOT EXISTS loggedin (
+    acc_num INT,
+    admin_id INT,
+    FOREIGN KEY (acc_num) REFERENCES users(acc_num), 
+    FOREIGN KEY (admin_id) REFERENCES admin(admin_id),
+    CHECK (acc_num IS NULL OR admin_id IS NULL)
 );
 
 INSERT INTO admin 
 	(username, password)
 VALUES
 	("admin", "password");
+
+INSERT INTO loggedin 
+VALUES (NULL, NULL);

@@ -3,6 +3,9 @@ USE cset170final;
 SELECT * FROM users;
 SELECT * FROM addresses;
 SELECT * FROM admin;
+SELECT * FROM loggedin;
+
+ALTER TABLE admin ADD CONSTRAINT unique_username UNIQUE (username);
 
 INSERT INTO users 
 	(username, password, balance, first_name, last_name, ssn)
