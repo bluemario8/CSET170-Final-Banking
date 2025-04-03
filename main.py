@@ -97,7 +97,7 @@ def signup():
         conn.execute(text("INSERT INTO applications "
                         "    (username, password, first_name, last_name, ssn, phone_num)"
                         "VALUES "
-                        f"('{request.form['username']}', '{request.form['password']}', '{request.form['first_name']}', "
+                        f"('{request.form['username']}', '{customHash(request.form['password'])}', '{request.form['first_name']}', "
                         f" '{request.form['last_name']}', '{request.form['ssn']}', {phone_num})"))
         conn.commit()
         appli_id = conn.execute(text("SELECT appli_num FROM applications "
@@ -124,7 +124,7 @@ def login():
 
     elif request.method == "POST":
         username = request.form['username']
-        password = request.form['password']
+        password = customHash(request.form['password'])
         admin_username = dict( conn.execute(text("SELECT username, password FROM admin")).all() )
         users_username = dict( conn.execute(text("SELECT username, password FROM users")).all() )
         
