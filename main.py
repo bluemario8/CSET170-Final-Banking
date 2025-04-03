@@ -98,7 +98,7 @@ def signup():
                         "    (username, password, first_name, last_name, ssn, phone_num)"
                         "VALUES "
                         f"('{request.form['username']}', '{request.form['password']}', '{request.form['first_name']}', "
-                        f" '{request.form['last_name']}', '{request.form['ssn']}', '{phone_num}')"))
+                        f" '{request.form['last_name']}', '{request.form['ssn']}', {phone_num})"))
         conn.commit()
         appli_id = conn.execute(text("SELECT appli_num FROM applications "
                                 f"WHERE username = '{request.form['username']}'")).all()[0][0]
@@ -111,7 +111,7 @@ def signup():
         # except:
             # return render_template("signup.html", error="Error")
 
-        return render_template("signup.html", success="Success")
+        return render_template("signup.html", success="Success. Your account now needs accepted")
 
 # ---------------- #
 # -- LOGIN PAGE -- #
