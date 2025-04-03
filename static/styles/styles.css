@@ -126,7 +126,8 @@ table, th, td{
 }
 
 .login-form input[type='text'],
-.login-form input[type='password'] {
+.login-form input[type='password'],
+.login-form select {
     font-family: var(--font-main);
     font-size: 1.2rem;
     margin-bottom: 1rem;

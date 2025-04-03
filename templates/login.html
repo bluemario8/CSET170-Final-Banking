@@ -1,19 +1,19 @@
 <link rel="stylesheet" href="../static/styles/styles.css">
 {% extends 'base.html' %}
 {% block body %}
-{% if error %}
-<h2 class="error">{{error}}</h2>
-{% endif %}
-{% if success %}
-<h2 class="success">{{success}}</h2>
-{% endif %}
-<div class="page">
-    <form method="POST" class="pageBody login-form">
-        <label for="username">Username</label>
-        <input type="text" id="username" name="username">
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password">
-        <input type="submit" value="Submit">
-    </form>
-</div>
+    {% if error %}
+    <h2 class="error">{{error}}</h2>
+    {% endif %}
+    {% if success %}
+    <h2 class="success">{{success}}</h2>
+    {% endif %}
+    <div class="page">
+        <form method="POST" class="pageBody login-form">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password">
+            <input type="submit" value="Submit">
+        </form>
+    </div>
 {% endblock %}
