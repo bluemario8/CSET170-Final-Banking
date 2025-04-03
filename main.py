@@ -34,6 +34,58 @@ class User(UserMixin):
 def home():
     return render_template('index.html')
 
+
+# ------------------ #
+# -- ACCOUNT PAGE -- #
+# ------------------ #
+
+@app.route('/account', methods=['GET'])
+def account():
+    current = getCurrentUser()
+    users = list(conn.execute(text('SELECT acc_num, CONCAT(first_name, " ", last_name), username, phone_num FROM users WHERE acc_num = :current;'), {'current': current}).fetchone())
+    address = list(conn.execute(text('SELECT CONCAT(street_addr, ", ", city, ", ", state, " ", zip_code, " ", country) FROM addresses WHERE acc_num = :current;'), {'current': current}).fetchone())
+    print(current)
+    print(users)
+    print(address)
+    return render_template('account.html', accounts = users, address = address)
+
+
+# ------------------ #
+# -- BALANCE PAGE -- #
+# ------------------ #
+
+@app.route('/balance', methods={'GET'})
+def balance():
+    current = getCurrentUser()
+    balance = conn.execute(text('SELECT acc_num, balance FROM users WHERE acc_num = :current'), {'current': current}).fetchone()
+    print(balance)
+    return render_template('balance.html', balance = balance)
+
+
+# --------------- #
+# -- FUNCTIONS -- # 
+# --------------- #
+
+def getCurrentUser():                                                                   # FUNCTION gets current user id
+    user = conn.execute(text('SELECT * FROM loggedin;')).all()                          # gets data from loggedin table
+
+    if loggedIntoType() == 'user':                                                      # if user type account
+        return user[0][0]                                                               # return acc_num
+    elif loggedIntoType() == 'admin':                                                   # elif admin type account
+        return user[0][1]                                                               # return admin_id
+
+def loggedIntoType():                                                                   # FUNCTION checks user type that is logged in 
+    value = conn.execute(text("SELECT * FROM loggedin")).all()
+    
+    if value[0][0]:                                                                     # returns user type if 
+        return "user"                                                                   # acc_num is not null 
+    elif value[0][1]:                                                                   # returns admin type if
+        return "admin"                                                                  # admin_id is not null
+    else:                                                                               # else both are null and 
+        return None                                                                     # is therefore not signed in
+
+
+
 # ----------------- #
 # -- SIGNUP PAGE -- #
 # ----------------- #

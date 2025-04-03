@@ -9,6 +9,8 @@ body{
 }
 
 .page{
+    background-image: linear-gradient(#112250b3, #11225059), url(https://imageio.forbes.com/specials-images/imageserve/60eda0efdccb85252c59d7a9/0x0.jpg?format=jpg&height=900&width=1600&fit=bounds);
+    background-size: contain;
     min-height: var(--page-height);
 }
 
@@ -34,11 +36,6 @@ body{
 /* -- HOME STYLES -- */
 /* ----------------- */
 
-.home{
-    background-image: linear-gradient(#11225059, #11225059), url(https://imageio.forbes.com/specials-images/imageserve/60eda0efdccb85252c59d7a9/0x0.jpg?format=jpg&height=900&width=1600&fit=bounds);
-    background-size: contain;
-}
-
 .greeting{
     display: flex;
     flex-direction: column;
@@ -53,6 +50,61 @@ body{
     justify-content: space-between;
     margin-top: 10px;
     width: 100px;
-    color: var(--color-yellow);
+    color: var(--color-pink);
     text-decoration: none;
+}
+
+
+/* -------------------- */
+/* -- ACCOUNT STYLES -- */
+/* -------------------- */
+
+.accountContainer{
+    margin: 0 auto;
+    margin-top: 40px;
+    width: 80%;
+}
+
+.accountTable{
+    width: 100%;
+    color: var(--color-med-blue);
+    font-size: 22px;
+}
+
+.tableRow > th,
+.tableRow > td{
+    width: 33%;
+}
+
+table, th, td{
+    border: 1px solid var(--color-dark-blue);
+    background-color: var(--color-white);
+}
+
+.contact,
+.address{
+    margin-top: 25px;
+}
+
+
+/* -- send money btn styles -- */
+
+.moneyBtnContainer{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 auto;
+    margin-top: 40px;
+    width: 80%;
+}
+
+.send-money-btn{
+    margin: 40px auto;
+    border: none;
+    border-radius: 5px;
+    background-color: var(--color-med-blue);
+    padding: 10px;
+    width: fit-content;
+    color: var(--color-white);
+    font-size: 18px;
 }

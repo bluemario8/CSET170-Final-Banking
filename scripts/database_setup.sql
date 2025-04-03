@@ -39,13 +39,11 @@ CREATE TABLE IF NOT EXISTS admin (
     username VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(100) NOT NULL
 );
--- If you ran the old admin table create and don't want to delete loggedin
--- ALTER TABLE admin ADD CONSTRAINT unique_username UNIQUE (username);
 
 CREATE TABLE IF NOT EXISTS loggedin (
     acc_num INT,
     admin_id INT,
-    FOREIGN KEY (acc_num) REFERENCES users(acc_num), 
+    FOREIGN KEY (acc_num) REFERENCES users(acc_num),
     FOREIGN KEY (admin_id) REFERENCES admin(admin_id),
     CHECK (acc_num IS NULL OR admin_id IS NULL)
 );
@@ -54,6 +52,10 @@ INSERT INTO admin
 	(username, password)
 VALUES
 	("admin", "password");
-
-INSERT INTO loggedin 
-VALUES (NULL, NULL);
+    
+INSERT INTO users (acc_num, username, first_name, last_name, phone_num, password, ssn) VALUES(001, 'ddzidzic', 'Daedalus', 'Dzidzic', '1234567890', 'password', '333222444');
+INSERT INTO loggedin (acc_num) VALUES(001);
+INSERT INTO addresses (acc_num, street_addr, city, state, zip_code, country) VALUES (1, '123 Example St.', 'City', 'PA', '12345', 'US');
+select * from users;
+select * from loggedin;
+select * from addresses;
