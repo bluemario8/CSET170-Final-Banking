@@ -4,19 +4,20 @@ USE cset170final;
 CREATE TABLE IF NOT EXISTS users (
 	acc_num INT PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(50) NOT NULL UNIQUE,
-    password VARCHAR(100) NOT NULL,
-    balance INT NOT NULL DEFAULT 0,
+    password VARCHAR(300) NOT NULL,
+    balance INT(255) NOT NULL DEFAULT 0,
     first_name VARCHAR(50) NOT NULL,
     last_name VARCHAR(50) NOT NULL,
     ssn VARCHAR(9) NOT NULL,
     phone_num VARCHAR(15),
     CONSTRAINT chk_ssn_9_chars CHECK (LENGTH(ssn) = 9)
 );
+ALTER TABLE acc_num AUTO_INCREMENT=550850;
 
 CREATE TABLE IF NOT EXISTS applications (
     appli_num INT PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(50) NOT NULL UNIQUE,
-    password VARCHAR(100) NOT NULL,
+    password VARCHAR(300) NOT NULL,
     first_name VARCHAR(50) NOT NULL,
     last_name VARCHAR(50) NOT NULL,
     ssn VARCHAR(9) NOT NULL,
@@ -63,12 +64,15 @@ INSERT INTO admin
 VALUES
 	("admin", "password");
     
-INSERT INTO users (acc_num, username, first_name, last_name, phone_num, password, ssn) VALUES(001, 'ddzidzic', 'Daedalus', 'Dzidzic', '1234567890', 'password', '333222444');
-INSERT INTO loggedin (acc_num) VALUES(001);
-INSERT INTO addresses (acc_num, street_addr, city, state, zip_code, country) VALUES (1, '123 Example St.', 'City', 'PA', '12345', 'US');
+INSERT INTO users (username, balance, first_name, last_name, phone_num, password, ssn) VALUES('ddzidzic', '95000', 'Daedalus', 'Dzidzic', '1234567890', 'password', '333222444');
+
+INSERT INTO loggedin (acc_num) VALUES(550850);
+INSERT INTO addresses (acc_num, street_addr, city, state, zip_code) VALUES (1, '123 Example St.', 'City', 'PA', '12345');
 select * from users;
 select * from loggedin;
 select * from addresses;
 
 INSERT INTO loggedin 
 VALUES (NULL, NULL);
+
+-- drop database cset170final;

@@ -134,7 +134,9 @@ def account():
 @app.route('/balance', methods={'GET'})
 def balance():
     current = getCurrentUser()
-    balance = conn.execute(text('SELECT acc_num, balance FROM users WHERE acc_num = :current'), {'current': current}).fetchone()
+    balanceInfo = conn.execute(text('SELECT acc_num, balance FROM users WHERE acc_num = :current'), {'current': current}).fetchone()
+    balanceNum = realBalance(balanceInfo[1])
+    balance = [balanceInfo[0], balanceNum]
     print(balance)
     return render_template('balance.html', balance = balance)
 
@@ -192,7 +194,11 @@ def getCurrentUser():
     if loggedIntoType() == 'user':                                               
         return user[0][0]                                                               
     elif loggedIntoType() == 'admin':                                             
-        return user[0][1]                                                               
+        return user[0][1]      
+
+def realBalance(int):
+    int = int / 100
+    return '{:.{}f}'.format(int, 2)                                                         
 
 
 if __name__ == "__main__":
