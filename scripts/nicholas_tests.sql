@@ -1,8 +1,18 @@
 USE cset170final;
 
 SELECT * FROM users;
+SELECT * FROM applications;
 SELECT * FROM addresses;
 SELECT * FROM admin;
+SELECT * FROM loggedin;
+DESC applications;
+DESC addresses;
+
+INSERT INTO applications     
+	(username, password, first_name, last_name, ssn, phone_num)
+VALUES ('newacc', 'newacc', 'New',  'Account', '123456789', 7177896789);
+
+ALTER TABLE admin ADD CONSTRAINT unique_username UNIQUE (username);
 
 INSERT INTO users 
 	(username, password, balance, first_name, last_name, ssn)
