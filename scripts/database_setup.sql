@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS users (
     first_name VARCHAR(50) NOT NULL,
     last_name VARCHAR(50) NOT NULL,
     ssn VARCHAR(9) NOT NULL,
-    phone_num INT,
+    phone_num VARCHAR(15),
     CONSTRAINT chk_ssn_9_chars CHECK (LENGTH(ssn) = 9)
 );
 
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS applications (
     first_name VARCHAR(50) NOT NULL,
     last_name VARCHAR(50) NOT NULL,
     ssn VARCHAR(9) NOT NULL,
-    phone_num int
+    phone_num VARCHAR(15)
 );
 
 CREATE TABLE IF NOT EXISTS addresses (
@@ -30,7 +30,6 @@ CREATE TABLE IF NOT EXISTS addresses (
     city VARCHAR(100) NOT NULL,
     state VARCHAR(100) NOT NULL,
     zip_code INT NOT NULL,
-    country VARCHAR(2) NOT NULL,
     FOREIGN KEY (acc_num) REFERENCES users(acc_num),
     FOREIGN KEY (appli_num) REFERENCES applications(appli_num)
 );

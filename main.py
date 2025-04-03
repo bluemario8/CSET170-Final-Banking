@@ -34,10 +34,56 @@ class User(UserMixin):
 def home():
     return render_template('index.html')
 
+# ----------------- #
+# -- SIGNUP PAGE -- #
+# ----------------- #
 
 @app.route('/signup', methods=["GET", "POST"])
 def signup():
-    return "signup"
+    if request.method == "GET":
+        return render_template("signup.html")
+    
+    if request.method == "POST":
+        # try:
+        usersDB = conn.execute(text("SELECT username, password, first_name, last_name, ssn, phone_num "
+                                    "FROM users")).all()
+        applicationsDB = conn.execute(text("SELECT username, password, first_name, last_name, ssn, phone_num "
+                                        "FROM applications")).all()
+        adminDB = conn.execute(text("SELECT username, password "
+                                        "FROM admin")).all()
+        usernameIndex, passwordIndex, first_nameIndex = 0, 1, 2
+        last_nameIndex, ssnIndex, phone_numIndex = 3, 4, 5
+        phone_num = request.form['phone_num'] if request.form['phone_num'] else 'NULL'
+
+        for user in usersDB:
+            if request.form['username'] == user[usernameIndex]:
+                return render_template("signup.html", error="Error: That username already exist")
+        for application in applicationsDB:
+            if request.form['username'] == application[usernameIndex]:
+                return render_template("signup.html", error="Error: That username is currently pending")
+        if request.form['username'] == adminDB[0][usernameIndex]:
+            return render_template("signup.html", error="Error: Invalid username")
+        
+        
+        
+        conn.execute(text("INSERT INTO applications "
+                        "    (username, password, first_name, last_name, ssn, phone_num)"
+                        "VALUES "
+                        f"('{request.form['username']}', '{request.form['password']}', '{request.form['first_name']}', "
+                        f" '{request.form['last_name']}', '{request.form['ssn']}', '{phone_num}')"))
+        conn.commit()
+        appli_id = conn.execute(text("SELECT appli_num FROM applications "
+                                f"WHERE username = '{request.form['username']}'")).all()[0][0]
+        conn.execute(text("INSERT INTO addresses "
+                            "(appli_num, street_addr, city, state, zip_code) "
+                            "VALUES "
+                            f"({appli_id}, '{request.form['street_addr']}', '{request.form['city']}', "
+                            f"'{request.form['state']}', '{request.form['zip_code']}')"))
+        conn.commit()
+        # except:
+            # return render_template("signup.html", error="Error")
+
+        return render_template("signup.html", success="Success")
 
 # ---------------- #
 # -- LOGIN PAGE -- #
