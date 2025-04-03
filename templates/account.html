@@ -1,0 +1,41 @@
+<link rel="stylesheet" href="../static/styles/styles.css">
+{% extends 'base.html' %}
+{% block body %}
+<section class="page">
+    <div class="pageBody">
+        <h2 class="title">Account Information</h2>
+        <div class="accountContainer">
+            <table class="accountTable">
+                <tr class="tableRow">
+                    <th>Account number</th>
+                    <th>Name</th>
+                    <th>Username</th>
+                </tr>
+                <tr class= "accounts tableRow">
+                    <td>{{ accounts[0] }}</td>
+                    <td>{{ accounts[1] }}</td>
+                    <td>{{ accounts[2] }}</td>
+                </tr>
+            </table>
+            <table class="accountTable contact">
+                <tr class="tableRow">
+                    <th>Email</th>
+                    <th>Phone number</th>
+                </tr>
+                <tr class="tableRow">
+                    <td>Email here</td>
+                    <td>{{ accounts[3] }}</td>
+                </tr>
+            </table>
+            <table class="accountTable address">
+                <tr>
+                    <th>Address</th>
+                </tr>
+                <tr>
+                    <td>{{ address[0] }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}
