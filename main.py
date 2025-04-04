@@ -4,7 +4,7 @@ from scripts.shhhh_its_a_secret import customHash
 # from flask_login import UserMixin, LoginManager, login_user, logout_user, login_required
 # from flask_sqlalchemy import SQLAlchemy
 
-# npm install imask
+# npm install imask for js in balance.html
 
 app = Flask(__name__)                                                                   # initiates flask
 app.config['SQLALCHEMY_DATABASE_URI'] = "mysql://root:cset155@localhost/cset170final"
