@@ -13,6 +13,9 @@
             {% endif %}
 
             <div class="appli-container">
+                {% if not appliDB %}
+                    <h2>No applications currently submitted</h2>
+                {% endif %}
                 {% for appli in appliDB %}
                     <table id="{{appli[appli_num_i]}}" class="appli">
                         <tr class="appli-tr">
@@ -42,11 +45,17 @@
                         <tr>
                             <td class="appli-submit">
                                 <form method="POST">
-                                    <input type="text" style="display: none;" name="appli_num" value="{{appli[appli_num_i]}}" >
+                                    <input type="text" style="display: none;" name="appli_num" value="{{appli[appli_num_i]}}">
                                     <input type="submit" value="Accept Application" class="btn appli-btn">
                                 </form>
                             </td>
-                            <td class="appli-td"></td>
+                            <td class="appli-submit">
+                                <form method="POST">
+                                    <input type="text" style="display: none;" name="appli_num_delete" value="{{appli[appli_num_i]}}">
+                                    <input type="submit" value="Deny Application" class="btn appli-btn">
+                                </form>
+
+                            </td>
                         </tr>
                     </table>
                 {% endfor %}

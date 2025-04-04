@@ -153,7 +153,7 @@ def applications():
         if request.method == "GET":
             return render_template("applications.html", appliDB = applicationsDB)
 
-        elif request.method == "POST":
+        elif request.method == "POST" and 'appli_num' in request.form.keys():
             print("Is admin. Accepting application")
             appli_num = request.form['appli_num']
             print(f"appli_num: {appli_num}")
@@ -193,6 +193,24 @@ def applications():
                 return render_template("applications.html", appliDB = applicationsDB, error="Invalid application number")
 
             return render_template("applications.html", appliDB = applicationsDB, success="Successfully accepted user")
+        
+        elif request.method == "POST" and 'appli_num_delete' in request.form.keys():
+            print("Is admin. Denying application")
+            appli_num = request.form['appli_num_delete']
+            appli = conn.execute(text(
+                "SELECT * FROM applications "
+                f"WHERE appli_num = {appli_num}")).all()
+
+            if not appli:
+                return render_template("applications.html", appliDB = applicationsDB, error="Invalid application number")
+            appli = appli[0]
+
+            conn.execute(text(f"DELETE FROM addresses WHERE appli_num = {appli_num}"))
+            conn.execute(text(f"DELETE FROM applications WHERE appli_num = {appli_num}"))
+            conn.commit()
+            applicationsDB = conn.execute(text("SELECT * FROM applications")).all()
+             
+            return render_template("applications.html", appliDB = applicationsDB, success="Successfully denied user")
 
     else: # Not logged in as an admin
         print("Is not admin. :(")
