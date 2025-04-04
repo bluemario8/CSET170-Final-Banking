@@ -1,8 +1,10 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, url_for
 from sqlalchemy import create_engine, text, insert, Table, MetaData, update
 from scripts.shhhh_its_a_secret import customHash
 # from flask_login import UserMixin, LoginManager, login_user, logout_user, login_required
 # from flask_sqlalchemy import SQLAlchemy
+
+# npm install imask for js in balance.html
 
 app = Flask(__name__)                                                                   # initiates flask
 app.config['SQLALCHEMY_DATABASE_URI'] = "mysql://root:cset155@localhost/cset170final"
@@ -36,7 +38,6 @@ def home():
 
 
 # ------------------ #
-# -- ACCOUNT PAGE -- #
 # ------------------ #
 
 @app.route('/account', methods=['GET'])
@@ -49,22 +50,8 @@ def account():
     print(address)
     return render_template('account.html', accounts = users, address = address)
 
-
-# ------------------ #
-# -- BALANCE PAGE -- #
-# ------------------ #
-
-@app.route('/balance', methods={'GET'})
-def balance():
-    current = getCurrentUser()
-    balance = conn.execute(text('SELECT acc_num, balance FROM users WHERE acc_num = :current'), {'current': current}).fetchone()
-    print(balance)
-    return render_template('balance.html', balance = balance)
-
-
 # ----------------- #
 # -- SIGNUP PAGE -- #
-# ----------------- #
 
 @app.route('/signup', methods=["GET", "POST"])
 def signup():
@@ -138,6 +125,41 @@ def login():
             return render_template("login.html", error="Error: Invalid username or password")
         
         return render_template("login.html", success="Login success")
+      
+      
+# ------------------ #
+# -- BALANCE PAGE -- #
+# ------------------ #
+
+@app.route('/balance', methods=['GET'])
+def balance():
+    current = getCurrentUser()
+    balanceInfo = conn.execute(text('SELECT acc_num, balance FROM users WHERE username = :current'), {'current': current}).all()
+    balanceDict = []
+    for balance in balanceInfo:
+        balanceNum = realBalance(balance[1])
+        balanceDict.append((balance[0], balanceNum))
+    print(balanceDict)
+    return render_template('balance.html', balance = balanceDict)
+
+# -- add money -- #
+@app.route('/update_balance', methods=['POST', 'GET'])
+def update_balance():
+    accountNum = request.form.get('account')
+    amount = request.form.get('addAmount')
+    amount = round(float(amount), 2)
+    print('account:', accountNum)
+    print('amount:', amount)
+
+    try:
+        amount = amount * 100
+        conn.execute(text('UPDATE users SET balance = balance + :amount WHERE acc_num = :account'), {'amount': amount, 'account': accountNum})
+        conn.commit()
+        print('success')
+    except Exception as e:
+        print('error updating balance:', e)
+
+    return redirect(url_for('balance'))
 
 # ----------------------- #
 # -- APPLICATIONS PAGE -- #
@@ -230,7 +252,7 @@ def logIntoDB(accType, username=None, password=None):
         """
         if accType is None:                                                           
             conn.execute(text("UPDATE loggedin "                                      
-                            f"SET acc_num = NULL, admin_id = NULL"))
+                            f"SET username = NULL, admin_id = NULL"))
             conn.commit()                                                             
             return "logged out"
         
@@ -238,8 +260,8 @@ def logIntoDB(accType, username=None, password=None):
             result = conn.execute(text( "SELECT admin_id FROM admin "
                                        f"WHERE username = '{username}' AND password = '{password}'")).all()
         elif accType == 'user':
-            result = conn.execute(text( "SELECT acc_num FROM users "
-                                       f"WHERE username = '{username}' AND password = '{password}'")).all()
+            result = conn.execute(text( "SELECT username FROM users "
+                                       f"WHERE password = '{password}'")).all()
 
         print(f"logIntoDB result variable = {result}")
         
@@ -249,8 +271,8 @@ def logIntoDB(accType, username=None, password=None):
         stored_id = result[0][0]                                                      
 
         conn.execute(                                                                 
-            text("UPDATE loggedin SET acc_num = :acc_num, admin_id = :admin_id"),
-                {'acc_num': stored_id if accType == 'user' else None,
+            text("UPDATE loggedin SET username = :username, admin_id = :admin_id"),
+                {'username': stored_id if accType == 'user' else None,
                 'admin_id': stored_id if accType == 'admin' else None}
         )                                             
         conn.commit()                                                                 
@@ -274,6 +296,10 @@ def loggedIntoType():                                                           
         return "admin"                                                                  # admin_id is not null
     else:                                                                               # else both are null and 
         return None                                                                     # is therefore not signed in
+
+def realBalance(int):
+    int = int / 100
+    return '{:.{}f}'.format(int, 2)                                                         
 
 
 if __name__ == "__main__":

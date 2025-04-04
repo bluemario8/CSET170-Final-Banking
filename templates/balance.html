@@ -1,4 +1,116 @@
 <link rel="stylesheet" href="../static/styles/styles.css">
+<script src="https://unpkg.com/imask"></script>
+<script src="https://kit.fontawesome.com/318fe15147.js" crossorigin="anonymous"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        let name = document.getElementById('name');
+        let cardnumber = document.getElementById('cardNum');
+        let expiration = document.getElementById('expiration');
+        let securitycode = document.getElementById('codeNum');
+        let cardImage = document.getElementById('cardImg');
+        let money = document.getElementById('moneyAmount');
+
+        // regex defines pattern for matching
+        // IIN is the first few digits of a card that identify the card issuer
+        // visa -> 4
+        // mastercard -> 51-54
+        // amex -> 34 or 37
+        // discover -> 6011 or 65
+        let cardNumberMask = new IMask(cardnumber, {
+            mask: [
+                {
+                    mask: '0000 000000 00000',
+                    regex: '^3[47]\\d{0,13}',
+                    cardtype: 'american express'
+                },
+                {
+                    mask: '0000 0000 0000 0000',
+                    regex: '^(?:6011|65\\d{0,2}|64[4-9]\\d?)\\d{0,12}',
+                    cardtype: 'discover'
+                },
+                {
+                    mask: '0000 0000 0000 0000',
+                    regex: '^(5[1-5]\\d{0,2}|222[1-9]|22[3-9]\\d|2[3-6]\\d{2}|27[0-1]\\d|2720)\\d{0,12}',
+                    cardtype: 'mastercard'
+                },
+                {
+                    mask: '0000 0000 0000 0000',
+                    regex: '^4\\d{0,15}',
+                    cardtype: 'visa'
+                },
+                {
+                    mask: '0000 0000 0000 0000',
+                    cardtype: 'unknown'
+                }
+            ],
+            dispatch: function (appended, dynamicMasked){
+                let number = (dynamicMasked.value + appended).replace(/\D/g,'');
+
+                for(let i=0; i<dynamicMasked.compiledMasks.length; i++){
+                    let re = new RegExp(dynamicMasked.compiledMasks[i].regex);
+                    if(number.match(re) != null){
+                        return dynamicMasked.compiledMasks[i];
+                    }
+                }
+            }
+        });
+
+        let expirationDateMask = new IMask(expiration, {
+            mask: 'MM{/}YY',
+            blocks: {
+                MM: {
+                    mask: IMask.MaskedRange,
+                    from: 1,
+                    to: 12,
+                },
+                YY: {
+                    mask: IMask.MaskedRange,
+                    from: 25,
+                    to: 45,
+                },
+            }
+        });
+
+        let securityCodeMask = new IMask(securitycode, {
+            mask: '0000',
+        });
+
+        let moneyAmountMask = new IMask(document.getElementById('moneyAmount'), {
+            mask: Number,
+            min: 1,
+            max: 25000,
+            scale: 2,
+            radix: '.',
+            thousandsSeparator: ',',
+            normalizeZeros: true,
+            padFractionalZeros: false,
+        });
+
+        cardNumberMask.on('accept', () => {
+        let type = cardNumberMask.masked.currentMask.cardtype;
+        cardImage.classList.remove('fa-brands', 'fa-solid', 'fa-credit-card', 'fa-cc-amex', 'fa-cc-discover', 'fa-cc-mastercard', 'fa-cc-visa');
+
+        switch (type) {
+            case 'american express':
+                cardImage.classList.add('fa-brands', 'fa-cc-amex');
+                break;
+            case 'discover':
+                cardImage.classList.add('fa-brands', 'fa-cc-discover');
+                break;
+            case 'mastercard':
+                cardImage.classList.add('fa-brands', 'fa-cc-mastercard');
+                break;
+            case 'visa':
+                cardImage.classList.add('fa-brands', 'fa-cc-visa');
+                break;
+            default:
+                cardImage.classList.add('fa-solid', 'fa-credit-card')
+                break;
+        }
+    });
+
+    })
+</script>
 {% extends 'base.html' %}
 {% block body %}
 <section class="page">
@@ -10,14 +122,57 @@
                     <th>Account number</th>
                     <th>Balance</th>
                 </tr>
-                <tr class="tableRow">
-                    <td>{{ balance[0] }}</td>
-                    <td>{{ balance[1] }}</td>
-                </tr>
+                {% for b in balance %}
+                    <tr class="tableRow">
+                        <td>{{ b[0] }}</td>
+                        <td>{{ b[1] }}</td>
+                    </tr>
+                {% endfor %}
             </table>
         </div>
         <div class="moneyBtnContainer">
-            <button class="send-money-btn">Send money</button>
+            <button class="add-money-btn">Add money</button>
+        </div>
+        <div class="addMoneyContainer">
+            <div class="moneyItemSection">
+                <img src="../static/images/card_generic.jpg" alt="bank-card-generic" id="cardImage">
+            </div>
+            <div class="moneyItemSection">
+                <form action="/update_balance" method="POST" class="addMoneyForm">
+                    <div class="moneyItem">
+                        <label for="accountNum">Account</label>
+                        <select name="account" id="accountNum">
+                            {% for b in balance %}
+                                <option value="{{ b[0] }}">{{ b[0] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="moneyItem">
+                        <label for="name">Name</label>
+                        <input type="text" maxlength="25" name="name" id="name">
+                    </div>
+                    <div class="moneyItem">
+                        <label for="cardNum">Card Number</label>
+                        <input type="text" inputmode="numeric" name="card" id="cardNum">
+                        <i id="cardImg" class="fa-solid fa-credit-card"></i>
+                    </div>
+                    <div class="moneyItem">
+                        <label for="expiration">Expiration (mm/yy)</label>
+                        <input type="text" inputmode="numeric" name="expiration" id="expiration">
+                    </div>
+                    <div class="moneyItem">
+                        <label for="codeNum">Security Code</label>
+                        <input type="number" inputmode="numeric" name="code" id="codeNum">
+                    </div>
+                    <div class="moneyItem">
+                        <label for="moneyAmount">Amount $</label>
+                        <input type="text" inputmode="numeric" pattern="^\d+(\.\d{1,2})?\.\d{1,2}$" name="addAmount" id="moneyAmount">
+                    </div>
+                    <div class="moneyItem">
+                        <input type="submit" name="submit" id="submitBtn">
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </section>
