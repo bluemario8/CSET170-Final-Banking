@@ -138,6 +138,66 @@ def login():
         
         return render_template("login.html", success="Login success")
 
+# ----------------------- #
+# -- APPLICATIONS PAGE -- #
+# ----------------------- #
+
+@app.route("/applications", methods=["GET", "POST"])
+def applications():
+    appli_num_i, username_i, password_i = 0, 1, 2 
+    first_name_i, last_name_i, ssn_i, phone_num_i = 3, 4, 5, 6
+    applicationsDB = conn.execute(text("SELECT * FROM applications")).all()
+
+    # Only runs this page with database if the user is an admin
+    if loggedIntoType() == 'admin':
+        if request.method == "GET":
+            return render_template("applications.html", appliDB = applicationsDB)
+
+        elif request.method == "POST":
+            print("Is admin. Accepting application")
+            appli_num = request.form['appli_num']
+            print(f"appli_num: {appli_num}")
+
+            usersDB = conn.execute(text("SELECT acc_num, username FROM users")).all()
+            appli = conn.execute(text(
+                "SELECT * FROM applications "
+                f"WHERE appli_num = {appli_num}")).all()
+
+            if not appli:
+                return render_template("applications.html", appliDB = applicationsDB, error="Invalid application number")
+                
+            appli = appli[0]
+            appli_phone_num = appli[phone_num_i] if appli[phone_num_i] else "NULL"
+            
+            for user in usersDB:
+                if appli[username_i] == user[1]: # Shouldn't ever happen but who knows
+                    return render_template("applications.html", appliDB = applicationsDB, error="Username already exists")
+
+            if appli:
+                conn.execute(text(
+                    "INSERT INTO users "
+                    "   (username, password, "
+                    "    first_name, last_name, ssn, phone_num)"
+                    "VALUES"
+                    f"  ('{appli[username_i]}', '{appli[password_i]}', "
+                    f"'{appli[first_name_i]}', '{appli[last_name_i]}', '{appli[ssn_i]}', {appli_phone_num})"))
+                user_acc_num = conn.execute(text("SELECT acc_num FROM users "
+                                                f"WHERE username = '{appli[username_i]}'")).all()[0][0]
+                conn.execute(text(f"UPDATE addresses SET acc_num = {user_acc_num}, appli_num = NULL "
+                                  f"WHERE appli_num = {appli[appli_num_i]}"))
+                conn.execute(text(f"DELETE FROM applications WHERE appli_num = {appli[appli_num_i]}"))
+
+                conn.commit()
+                applicationsDB = conn.execute(text("SELECT * FROM applications")).all()
+            else: 
+                return render_template("applications.html", appliDB = applicationsDB, error="Invalid application number")
+
+            return render_template("applications.html", appliDB = applicationsDB, success="Successfully accepted user")
+
+    else: # Not logged in as an admin
+        print("Is not admin. :(")
+        return render_template("applications.html", error="Admin not logged in")
+
 
 # --------------- #
 # -- FUNCTIONS -- # 
