@@ -3,6 +3,12 @@
 {% block body %}
     <div class="page">
         <form method="POST" class="pageBody login-form">
+            {% if admin %}
+                <h2 class="signup-admin">
+                    You are an admin.
+                    <a href="/applications">Accept applications</a>?
+                </h2>
+            {% endif %}
             {% if error %}
             <h2 class="error">{{error}}</h2>
             {% endif %}

@@ -171,6 +171,13 @@ table, th, td{
     background-color: var(--color-med-blue);
 }
 
+/* ------------------- */
+/* -- SIGNUP STYLES -- */
+/* ------------------- */
+
+.signup-admin {
+    font-weight: 500;
+}
 
 /* ------------------------ */
 /* -- APPLICATION STYLES -- */

@@ -68,8 +68,9 @@ def balance():
 
 @app.route('/signup', methods=["GET", "POST"])
 def signup():
+    admin = loggedIntoType() == 'admin'
     if request.method == "GET":
-        return render_template("signup.html")
+        return render_template("signup.html", admin = admin)
     
     if request.method == "POST":
         # try:
@@ -85,12 +86,12 @@ def signup():
 
         for user in usersDB:
             if request.form['username'] == user[usernameIndex]:
-                return render_template("signup.html", error="Error: That username already exist")
+                return render_template("signup.html", admin = admin, error="Error: That username already exist")
         for application in applicationsDB:
             if request.form['username'] == application[usernameIndex]:
-                return render_template("signup.html", error="Error: That username is currently pending")
+                return render_template("signup.html", admin = admin, error="Error: That username is currently pending")
         if request.form['username'] == adminDB[0][usernameIndex]:
-            return render_template("signup.html", error="Error: Invalid username")
+            return render_template("signup.html", admin = admin, error="Error: Invalid username")
         
         
         
@@ -109,9 +110,9 @@ def signup():
                             f"'{request.form['state']}', '{request.form['zip_code']}')"))
         conn.commit()
         # except:
-            # return render_template("signup.html", error="Error")
+            # return render_template("signup.html", admin = admin, error="Error")
 
-        return render_template("signup.html", success="Success. Your account now needs accepted")
+        return render_template("signup.html", admin = admin, success="Success. Your account now needs accepted")
 
 # ---------------- #
 # -- LOGIN PAGE -- #
