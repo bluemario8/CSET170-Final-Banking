@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS users (
     phone_num VARCHAR(15),
     CONSTRAINT chk_ssn_9_chars CHECK (LENGTH(ssn) = 9)
 );
-ALTER TABLE acc_num AUTO_INCREMENT=550850;
+ALTER TABLE users AUTO_INCREMENT=550850;
 
 CREATE TABLE IF NOT EXISTS applications (
     appli_num INT PRIMARY KEY AUTO_INCREMENT,
@@ -52,12 +52,13 @@ CREATE TABLE IF NOT EXISTS loggedin (
 );
 
 CREATE TABLE IF NOT EXISTS loggedin (
-    acc_num INT,
+    username VARCHAR(255),
     admin_id INT,
-    FOREIGN KEY (acc_num) REFERENCES users(acc_num),
+    FOREIGN KEY (username) REFERENCES users(username),
     FOREIGN KEY (admin_id) REFERENCES admin(admin_id),
-    CHECK (acc_num IS NULL OR admin_id IS NULL)
+    CHECK (username IS NULL OR admin_id IS NULL)
 );
+-- drop table loggedin;
 
 INSERT INTO admin 
 	(username, password)
@@ -65,8 +66,9 @@ VALUES
 	("admin", "password");
     
 INSERT INTO users (username, balance, first_name, last_name, phone_num, password, ssn) VALUES('ddzidzic', '95000', 'Daedalus', 'Dzidzic', '1234567890', 'password', '333222444');
+INSERT INTO users (username, balance, first_name, last_name, phone_num, password, ssn) VALUES ('mmalova', '780000', 'Maya', 'Malova', '0987654321', 'password', '333222333');
 
-INSERT INTO loggedin (acc_num) VALUES(550850);
+INSERT INTO loggedin (username) VALUES('ddzidzic');
 INSERT INTO addresses (acc_num, street_addr, city, state, zip_code) VALUES (1, '123 Example St.', 'City', 'PA', '12345');
 select * from users;
 select * from loggedin;

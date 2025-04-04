@@ -1,8 +1,10 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, url_for
 from sqlalchemy import create_engine, text, insert, Table, MetaData, update
 from scripts.shhhh_its_a_secret import customHash
 # from flask_login import UserMixin, LoginManager, login_user, logout_user, login_required
 # from flask_sqlalchemy import SQLAlchemy
+
+# npm install imask
 
 app = Flask(__name__)                                                                   # initiates flask
 app.config['SQLALCHEMY_DATABASE_URI'] = "mysql://root:cset155@localhost/cset170final"
@@ -131,14 +133,35 @@ def account():
 # -- BALANCE PAGE -- #
 # ------------------ #
 
-@app.route('/balance', methods={'GET'})
+@app.route('/balance', methods=['GET'])
 def balance():
     current = getCurrentUser()
-    balanceInfo = conn.execute(text('SELECT acc_num, balance FROM users WHERE acc_num = :current'), {'current': current}).fetchone()
-    balanceNum = realBalance(balanceInfo[1])
-    balance = [balanceInfo[0], balanceNum]
-    print(balance)
-    return render_template('balance.html', balance = balance)
+    balanceInfo = conn.execute(text('SELECT acc_num, balance FROM users WHERE username = :current'), {'current': current}).all()
+    balanceDict = []
+    for balance in balanceInfo:
+        balanceNum = realBalance(balance[1])
+        balanceDict.append((balance[0], balanceNum))
+    print(balanceDict)
+    return render_template('balance.html', balance = balanceDict)
+
+# -- add money -- #
+@app.route('/update_balance', methods=['POST', 'GET'])
+def update_balance():
+    accountNum = request.form.get('account')
+    amount = request.form.get('addAmount')
+    amount = round(float(amount), 2)
+    print('account:', accountNum)
+    print('amount:', amount)
+
+    try:
+        amount = amount * 100
+        conn.execute(text('UPDATE users SET balance = balance + :amount WHERE acc_num = :account'), {'amount': amount, 'account': accountNum})
+        conn.commit()
+        print('success')
+    except Exception as e:
+        print('error updating balance:', e)
+
+    return redirect(url_for('balance'))
 
 
 def logIntoDB(accType, username=None, password=None):                                    
@@ -149,7 +172,7 @@ def logIntoDB(accType, username=None, password=None):
         """
         if accType is None:                                                           
             conn.execute(text("UPDATE loggedin "                                      
-                            f"SET acc_num = NULL, admin_id = NULL"))
+                            f"SET username = NULL, admin_id = NULL"))
             conn.commit()                                                             
             return "logged out"
         
