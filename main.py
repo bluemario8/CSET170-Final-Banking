@@ -272,6 +272,8 @@ def send_money_submit():
 
 @app.route('/statements')
 def statements():
+    if loggedIntoType() == 'admin' or loggedIntoType() == None:
+        return redirect(url_for('home'))
     current = getCurrentUser()
     userAccounts = conn.execute(
         text('SELECT acc_num FROM users WHERE username = :current;'),
