@@ -122,7 +122,7 @@ def login():
 
 @app.route('/account', methods=['GET', "POST"])
 def account():
-    if loggedIntoType() == 'admin':
+    if loggedIntoType() == 'admin' or loggedIntoType() == None:
         return redirect(url_for('home'))
     current = getCurrentUser()
     users = list(conn.execute(text('SELECT acc_num, CONCAT(first_name, " ", last_name), username, phone_num FROM users WHERE username = :current;'), {'current': current}).all())
@@ -158,7 +158,7 @@ def account():
 
 @app.route('/balance', methods=['GET'])
 def balance():
-    if loggedIntoType() == 'admin':
+    if loggedIntoType() == 'admin' or loggedIntoType() == None:
         return redirect(url_for('home'))
 
     current = getCurrentUser()
@@ -173,7 +173,7 @@ def balance():
 # -- add money -- #
 @app.route('/update_balance', methods=['POST', 'GET'])
 def update_balance():
-    if loggedIntoType() == 'admin':
+    if loggedIntoType() == 'admin' or loggedIntoType() == None:
         return redirect(url_for('home'))
 
     accountNum = request.form.get('account')
@@ -199,7 +199,7 @@ def update_balance():
 
 @app.route('/send_money', methods=['GET', 'POST'])
 def send_money():
-    if loggedIntoType() == 'admin':
+    if loggedIntoType() == 'admin' or loggedIntoType() == None:
         return redirect(url_for('home'))
 
     current = getCurrentUser()
@@ -219,7 +219,7 @@ def send_money():
 
 @app.route('/send_money_submit', methods=['POST', 'GET'])
 def send_money_submit():
-    if loggedIntoType() == 'admin':
+    if loggedIntoType() == 'admin' or loggedIntoType() == None:
         return redirect(url_for('home'))
 
     fromAccount = request.form.get('accounts')
@@ -247,7 +247,7 @@ def applications():
     applicationsDB = conn.execute(text("SELECT * FROM applications")).all()
 
     # Only runs this page with database if the user is an admin
-    if loggedIntoType() == 'admin':
+    if loggedIntoType() == 'admin' or loggedIntoType() == None:
         if request.method == "GET":
             return render_template("applications.html", appliDB = applicationsDB)
 
@@ -361,7 +361,7 @@ def getCurrentUser():                                                           
 
     if loggedIntoType() == 'user':                                                      # if user type account
         return user[0][0]                                                               # return acc_num
-    elif loggedIntoType() == 'admin':                                                   # elif admin type account
+    elif loggedIntoType() == 'admin' or loggedIntoType() == None:                                                   # elif admin type account
         return user[0][1]                                                               # return admin_id
 
 def loggedIntoType():                                                                   # FUNCTION checks user type that is logged in 
