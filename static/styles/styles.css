@@ -325,7 +325,7 @@ i#cardImg{
 table.sendMoneyTable,
 th.moneyHeader,
 td.moneyData{
-    border: solid 1px black;
+    border: solid 1px var(--color-dark-blue);
 }
 
 th.moneyHeader,
@@ -381,4 +381,31 @@ td.moneyData{
 }
 #submitSend:hover{
     background-color: var(--color-pink);
+}
+
+
+/* ----------------------- */
+/* -- STATEMENTS STYLES -- */
+/* ----------------------- */
+
+table.statementTable{
+    margin: 40px auto 0;
+    width: 700px;
+    color: var(--color-dark-blue);
+    font-family: var(--font-main);
+}
+
+table.statementTable,
+th.statementHeader,
+td.statementData{
+    border: solid 1px var(--color-dark-blue);
+    background-color: var(--color-white);
+}
+
+th.statementHeader{
+    font-size: 22px;
+}
+
+td.statementData{
+    font-size: 19px;
 }

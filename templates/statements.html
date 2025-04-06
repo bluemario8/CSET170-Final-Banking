@@ -1,0 +1,29 @@
+<link rel="stylesheet" href="../static/styles/styles.css">
+{% extends 'base.html' %}
+{% block body %}
+<section class="page">
+    <div class="pageBody">
+        <h2 class="title">Bank Statement</h2>
+        <table class="statementTable">
+            <tr class="statementRow">
+                <th class="statementHeader">Description</th>
+                <th class="statementHeader">Account</th>
+                <th class="statementHeader">Type</th>
+                <th class="statementHeader">Amount</th>
+                <th class="statementHeader">Other Party</th>
+                <th class="statementHeader">Date</th>
+            </tr>
+            {% for t in transactions %}
+            <tr class="statementRow">
+                <td class="statementData">{{ t.timestamp }}</td>
+                <td class="statementData">{{ t.acc_num }}</td>
+                <td class="statementData">{{ t.type }}</td>
+                <td class="statementData">${{ '%.2f' | format(t.amount) }}</td>
+                <td class="statementData">{{ t.other_party if t.other_party else '-' }}</td>
+                <td class="statementData">{{ t.description }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</section>
+{% endblock %}

@@ -202,12 +202,58 @@ def send_money_submit():
     amount = round(float(amountNum), 2)
     try:
         amount *= 100
-        conn.execute(text('UPDATE users SET balance = balance + :amount WHERE acc_num = :to'), {'to': toAccount, 'amount': amount})
-        conn.execute(text('UPDATE users SET balance = balance - :amount WHERE acc_num = :from'), {'from': fromAccount, 'amount': amount})
+        # account sending money
+        conn.execute(text('UPDATE users SET balance = balance - :amount WHERE acc_num = :from;'), 
+                     {'from': fromAccount, 'amount': amount})
+        conn.execute(
+            text('INSERT INTO transactions (acc_num, type, related_acc, amount, description) ' 
+            'VALUES (:from_acc, "debit", :to_acc, :amount, "Sent money");'),
+            {'from_acc': fromAccount, 'to_acc': toAccount, 'amount': amount})
+        
+        # account receiving money
+        conn.execute(
+            text('UPDATE users SET balance = balance + :amount WHERE acc_num = :to;'), 
+            {'to': toAccount, 'amount': amount})
+        conn.execute(
+            text('INSERT INTO transactions (acc_num, type, related_acc, amount, description) ' 
+            'VALUES (:to_acc, "credit", :from_acc, :amount, "Received money");'),
+            {'to_acc': toAccount, 'from_acc': fromAccount, 'amount': amount})
+        
         conn.commit()
     except Exception as e:
         print('error updating balance:', e)
     return redirect(url_for('send_money'))
+
+
+# --------------------- #
+# -- VIEW STATEMENTS -- #
+# --------------------- #
+
+@app.route('/statements')
+def statements():
+    current = getCurrentUser()
+    userAccounts = conn.execute(
+        text('SELECT acc_num FROM users WHERE username = :current;'),
+        {'current': current}).all()
+    accountNums = [a[0] for a in userAccounts]
+    
+    transactions = []
+    for acc in accountNums:
+        rows = conn.execute(
+            text('SELECT * FROM transactions WHERE acc_num = :acc ORDER BY timestamp DESC;'),
+            {'acc': acc}
+        ).all()
+        for row in rows:
+            transactions.append({
+                'acc_num': row[1],
+                'type': row[2],
+                'amount': realBalance(row[3]),
+                'other_party': row[4],
+                'description': row[5],
+                'timestamp': row[6]
+            })
+    
+    return render_template('statements.html', transactions = transactions)
 
 
 # ----------------------- #
