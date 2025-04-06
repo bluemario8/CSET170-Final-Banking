@@ -158,7 +158,13 @@ def update_balance():
 
     try:
         amount = amount * 100
-        conn.execute(text('UPDATE users SET balance = balance + :amount WHERE acc_num = :account'), {'amount': amount, 'account': accountNum})
+        conn.execute(
+            text('UPDATE users SET balance = balance + :amount WHERE acc_num = :account'), 
+            {'amount': amount, 'account': accountNum})
+        conn.execute(
+            text('INSERT INTO transactions (acc_num, type, related_acc, amount, description) ' 
+            'VALUES (:account, "deposit", :account, :amount, "Card deposit")'),
+            {'account': accountNum, 'amount': amount})
         conn.commit()
         print('success')
     except Exception as e:
