@@ -102,6 +102,6 @@ select * from loggedin;
 select * from addresses;
 select * from transactions;
 
--- UPDATE loggedin SET username = NULL, admin_id = NULL;
+UPDATE loggedin SET username = NULL, admin_id = NULL;
 
 -- drop database cset170final;

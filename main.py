@@ -114,6 +114,17 @@ def login():
             return render_template("login.html", error="Error: Invalid username or password")
         
         return render_template("login.html", success="Login success")
+    
+# -- sign out -- #
+
+@app.route('/signout')
+def signout():
+    conn.execute(
+        text('UPDATE loggedin SET username = NULL, admin_id = NULL ' \
+        'WHERE username IS NOT NULL OR admin_id IS NOT NULL;')
+    )
+    conn.commit()
+    return redirect('/login')
       
       
 # ------------------ #
@@ -148,8 +159,6 @@ def account():
         users = list(conn.execute(text('SELECT acc_num, CONCAT(first_name, " ", last_name), username, phone_num FROM users WHERE username = :current;'), {'current': current}).all())
 
         return render_template('account.html', accounts = users, address = address, phone = phoneNum)
-
-
 
 
 # ------------------ #
@@ -389,8 +398,9 @@ def logIntoDB(accType, username=None, password=None):
             result = conn.execute(text( "SELECT admin_id FROM admin "
                                        f"WHERE username = '{username}' AND password = '{password}'")).all()
         elif accType == 'user':
-            result = conn.execute(text( "SELECT username FROM users "
-                                       f"WHERE password = '{password}'")).all()
+            result = conn.execute(text( "SELECT :username FROM users "
+                                       f"WHERE password = :password"),
+                                       {'username': username, 'password': password}).all()
 
         print(f"logIntoDB result variable = {result}")
         
