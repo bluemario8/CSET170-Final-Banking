@@ -37,24 +37,9 @@ def home():
     return render_template('index.html')
 
 
-# ------------------ #
-# ------------------ #
-
-@app.route('/account', methods=['GET'])
-def account():
-    current = getCurrentUser()
-    users = list(conn.execute(text('SELECT acc_num, CONCAT(first_name, " ", last_name), username, phone_num FROM users WHERE username = :current;'), {'current': current}).fetchone())
-    acc_num = users[0]
-    print("acc_num")
-    print(acc_num)
-    address = list(conn.execute(text('SELECT CONCAT(street_addr, ", ", city, ", ", state, " ", zip_code) FROM addresses WHERE acc_num = :current;'), {'current': acc_num}).fetchone())
-    print(current)
-    print(users)
-    print(address)
-    return render_template('account.html', accounts = users, address = address)
-
 # ----------------- #
 # -- SIGNUP PAGE -- #
+# ----------------- #
 
 @app.route('/signup', methods=["GET", "POST"])
 def signup():
@@ -104,6 +89,7 @@ def signup():
 
         return render_template("signup.html", admin = admin, success="Success. Your account now needs accepted")
 
+
 # ---------------- #
 # -- LOGIN PAGE -- #
 # ---------------- #
@@ -146,8 +132,6 @@ def account():
     return render_template('account.html', accounts = users, address = address, phone = phoneNum)
 
 
-      
-      
 # ------------------ #
 # -- BALANCE PAGE -- #
 # ------------------ #
