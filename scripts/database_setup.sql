@@ -25,13 +25,12 @@ CREATE TABLE IF NOT EXISTS applications (
 );
 
 CREATE TABLE IF NOT EXISTS addresses (
-    acc_num INT UNIQUE,
+    username VARCHAR(50) UNIQUE,
     appli_num INT UNIQUE,
     street_addr VARCHAR(100) NOT NULL,
     city VARCHAR(100) NOT NULL,
     state VARCHAR(100) NOT NULL,
     zip_code INT NOT NULL,
-    FOREIGN KEY (acc_num) REFERENCES users(acc_num),
     FOREIGN KEY (appli_num) REFERENCES applications(appli_num)
 );
 
@@ -69,7 +68,7 @@ INSERT INTO users (username, balance, first_name, last_name, phone_num, password
 INSERT INTO users (username, balance, first_name, last_name, phone_num, password, ssn) VALUES ('mmalova', '780000', 'Maya', 'Malova', '0987654321', 'password', '333222333');
 
 INSERT INTO loggedin (username) VALUES('ddzidzic');
-INSERT INTO addresses (acc_num, street_addr, city, state, zip_code) VALUES (1, '123 Example St.', 'City', 'PA', '12345');
+INSERT INTO addresses (username, street_addr, city, state, zip_code) VALUES ('ddzidzic', '123 Example St.', 'City', 'PA', '12345');
 select * from users;
 select * from loggedin;
 select * from addresses;

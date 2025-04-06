@@ -121,8 +121,8 @@ def login():
 @app.route('/account', methods=['GET'])
 def account():
     current = getCurrentUser()
-    users = list(conn.execute(text('SELECT acc_num, CONCAT(first_name, " ", last_name), username, phone_num FROM users WHERE acc_num = :current;'), {'current': current}).fetchone())
-    address = list(conn.execute(text('SELECT CONCAT(street_addr, ", ", city, ", ", state, " ", zip_code, " ", country) FROM addresses WHERE acc_num = :current;'), {'current': current}).fetchone())
+    users = list(conn.execute(text('SELECT acc_num, CONCAT(first_name, " ", last_name), username, phone_num FROM users WHERE username = :current;'), {'current': current}).fetchone())
+    address = list(conn.execute(text('SELECT CONCAT(street_addr, ", ", city, ", ", state, " ", zip_code) FROM addresses WHERE username = :current;'), {'current': current}).fetchone())
     print(current)
     print(users)
     print(address)
