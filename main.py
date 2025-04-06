@@ -122,6 +122,8 @@ def login():
 
 @app.route('/account', methods=['GET', "POST"])
 def account():
+    if loggedIntoType() == 'admin':
+        return redirect(url_for('home'))
     current = getCurrentUser()
     users = list(conn.execute(text('SELECT acc_num, CONCAT(first_name, " ", last_name), username, phone_num FROM users WHERE username = :current;'), {'current': current}).all())
     address = list(conn.execute(text('SELECT CONCAT(street_addr, ", ", city, ", ", state, " ", zip_code) FROM addresses WHERE username = :current;'), {'current': current}).fetchone())
