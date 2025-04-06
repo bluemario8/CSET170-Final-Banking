@@ -120,8 +120,10 @@ def login():
 # -- ACCOUNT PAGE -- #
 # ------------------ #
 
-@app.route('/account', methods=['GET'])
+@app.route('/account', methods=['GET', "POST"])
 def account():
+    if loggedIntoType() == 'admin':
+        return redirect(url_for('home'))
     current = getCurrentUser()
     users = list(conn.execute(text('SELECT acc_num, CONCAT(first_name, " ", last_name), username, phone_num FROM users WHERE username = :current;'), {'current': current}).all())
     address = list(conn.execute(text('SELECT CONCAT(street_addr, ", ", city, ", ", state, " ", zip_code) FROM addresses WHERE username = :current;'), {'current': current}).fetchone())
@@ -129,7 +131,22 @@ def account():
     print(current)
     print(users)
     print(address)
-    return render_template('account.html', accounts = users, address = address, phone = phoneNum)
+
+    if request.method == "GET":
+        return render_template('account.html', accounts = users, address = address, phone = phoneNum)
+    
+    elif request.method == "POST":
+        u_info = conn.execute(text("SELECT username, password, first_name, last_name, ssn, phone_num "
+                                              f"FROM users WHERE username = '{current}'")).all()[0]
+        
+        conn.execute(text("INSERT INTO users (username, password, first_name, last_name, ssn, phone_num) "
+                          f"VALUES ('{u_info[0]}', '{u_info[1]}', '{u_info[2]}', '{u_info[3]}', '{u_info[4]}', {u_info[5]})"))
+        conn.commit()
+        users = list(conn.execute(text('SELECT acc_num, CONCAT(first_name, " ", last_name), username, phone_num FROM users WHERE username = :current;'), {'current': current}).all())
+
+        return render_template('account.html', accounts = users, address = address, phone = phoneNum)
+
+
 
 
 # ------------------ #
@@ -138,6 +155,9 @@ def account():
 
 @app.route('/balance', methods=['GET'])
 def balance():
+    if loggedIntoType() == 'admin':
+        return redirect(url_for('home'))
+
     current = getCurrentUser()
     balanceInfo = conn.execute(text('SELECT acc_num, balance FROM users WHERE username = :current'), {'current': current}).all()
     balanceDict = []
@@ -150,6 +170,9 @@ def balance():
 # -- add money -- #
 @app.route('/update_balance', methods=['POST', 'GET'])
 def update_balance():
+    if loggedIntoType() == 'admin':
+        return redirect(url_for('home'))
+
     accountNum = request.form.get('account')
     amount = request.form.get('addAmount')
     amount = round(float(amount), 2)
@@ -179,6 +202,9 @@ def update_balance():
 
 @app.route('/send_money', methods=['GET', 'POST'])
 def send_money():
+    if loggedIntoType() == 'admin':
+        return redirect(url_for('home'))
+
     current = getCurrentUser()
     balanceInfo = conn.execute(
         text('SELECT acc_num, balance FROM users WHERE username = :current'), 
@@ -196,6 +222,9 @@ def send_money():
 
 @app.route('/send_money_submit', methods=['POST', 'GET'])
 def send_money_submit():
+    if loggedIntoType() == 'admin':
+        return redirect(url_for('home'))
+
     fromAccount = request.form.get('accounts')
     toAccount = request.form.get('toAccounts')
     amountNum = request.form.get('sendAmount')
