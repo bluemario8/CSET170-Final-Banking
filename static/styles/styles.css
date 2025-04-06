@@ -176,8 +176,9 @@ i#cardImg{
     top: -15;
     right: -10.5rem;
     transform: translateY(-50%);
-    color: var(--color-dark-blue);
+    width: 40px;
     padding-left: 10px;
+    color: var(--color-dark-blue);
     font-size: 25px;
 }
 
