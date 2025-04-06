@@ -1,0 +1,65 @@
+<link rel="stylesheet" href="../static/styles/styles.css">
+{% extends 'base.html' %}
+{% set appli_num_i, username_i, password_i = 0, 1, 2 %}
+{% set first_name_i, last_name_i, ssn_i, phone_num_i = 3, 4, 5, 6 %}
+{% block body %}
+    <div class="page">
+        <div class="pageBody">
+            {% if error %}
+            <h2 class="error">{{error}}</h2>
+            {% endif %}
+            {% if success %}
+            <h2 class="success">{{success}}</h2>
+            {% endif %}
+
+            <div class="appli-container">
+                {% if not appliDB %}
+                    <h2>No applications currently submitted</h2>
+                {% endif %}
+                {% for appli in appliDB %}
+                    <table id="{{appli[appli_num_i]}}" class="appli">
+                        <tr class="appli-tr">
+                            <td>Application Number</td>
+                            <td>{{appli[appli_num_i]}}</td>
+                        </tr>
+                        <tr class="appli-tr">
+                            <td>Username</td>
+                            <td>{{appli[username_i]}}</td>
+                        </tr>
+                        <tr class="appli-tr">
+                            <td>First Name</td>
+                            <td>{{appli[first_name_i]}}</td>
+                        </tr>
+                        <tr class="appli-tr">
+                            <td>Last Name</td>
+                            <td>{{appli[last_name_i]}}</td>
+                        </tr>
+                        <tr class="appli-tr">
+                            <td>Social Security Number</td>
+                            <td>{{appli[ssn_i]}}</td>
+                        </tr>
+                        <tr class="appli-tr">
+                            <td>Phone Number</td>
+                            <td>{{appli[phone_num_i]}}</td>
+                        </tr>
+                        <tr>
+                            <td class="appli-submit">
+                                <form method="POST">
+                                    <input type="text" style="display: none;" name="appli_num" value="{{appli[appli_num_i]}}">
+                                    <input type="submit" value="Accept Application" class="btn appli-btn">
+                                </form>
+                            </td>
+                            <td class="appli-submit">
+                                <form method="POST">
+                                    <input type="text" style="display: none;" name="appli_num_delete" value="{{appli[appli_num_i]}}">
+                                    <input type="submit" value="Deny Application" class="btn appli-btn">
+                                </form>
+
+                            </td>
+                        </tr>
+                    </table>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

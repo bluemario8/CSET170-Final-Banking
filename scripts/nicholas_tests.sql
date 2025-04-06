@@ -10,7 +10,7 @@ DESC addresses;
 
 INSERT INTO applications     
 	(username, password, first_name, last_name, ssn, phone_num)
-VALUES ('newacc', 'newacc', 'New',  'Account', '123456789', 7177896789);
+VALUES ('newaccccccccc', 'newacc', 'New',  'Account', '123456789', 7177896789);
 
 ALTER TABLE admin ADD CONSTRAINT unique_username UNIQUE (username);
 

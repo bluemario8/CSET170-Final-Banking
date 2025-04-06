@@ -37,14 +37,30 @@ def home():
     return render_template('index.html')
 
 
+# ------------------ #
+# ------------------ #
+
+@app.route('/account', methods=['GET'])
+def account():
+    current = getCurrentUser()
+    users = list(conn.execute(text('SELECT acc_num, CONCAT(first_name, " ", last_name), username, phone_num FROM users WHERE username = :current;'), {'current': current}).fetchone())
+    acc_num = users[0]
+    print("acc_num")
+    print(acc_num)
+    address = list(conn.execute(text('SELECT CONCAT(street_addr, ", ", city, ", ", state, " ", zip_code) FROM addresses WHERE acc_num = :current;'), {'current': acc_num}).fetchone())
+    print(current)
+    print(users)
+    print(address)
+    return render_template('account.html', accounts = users, address = address)
+
 # ----------------- #
 # -- SIGNUP PAGE -- #
-# ----------------- #
 
 @app.route('/signup', methods=["GET", "POST"])
 def signup():
+    admin = loggedIntoType() == 'admin'
     if request.method == "GET":
-        return render_template("signup.html")
+        return render_template("signup.html", admin = admin)
     
     if request.method == "POST":
         # try:
@@ -60,20 +76,20 @@ def signup():
 
         for user in usersDB:
             if request.form['username'] == user[usernameIndex]:
-                return render_template("signup.html", error="Error: That username already exist")
+                return render_template("signup.html", admin = admin, error="Error: That username already exist")
         for application in applicationsDB:
             if request.form['username'] == application[usernameIndex]:
-                return render_template("signup.html", error="Error: That username is currently pending")
+                return render_template("signup.html", admin = admin, error="Error: That username is currently pending")
         if request.form['username'] == adminDB[0][usernameIndex]:
-            return render_template("signup.html", error="Error: Invalid username")
+            return render_template("signup.html", admin = admin, error="Error: Invalid username")
         
         
         
         conn.execute(text("INSERT INTO applications "
                         "    (username, password, first_name, last_name, ssn, phone_num)"
                         "VALUES "
-                        f"('{request.form['username']}', '{request.form['password']}', '{request.form['first_name']}', "
-                        f" '{request.form['last_name']}', '{request.form['ssn']}', '{phone_num}')"))
+                        f"('{request.form['username']}', '{customHash(request.form['password'])}', '{request.form['first_name']}', "
+                        f" '{request.form['last_name']}', '{request.form['ssn']}', {phone_num})"))
         conn.commit()
         appli_id = conn.execute(text("SELECT appli_num FROM applications "
                                 f"WHERE username = '{request.form['username']}'")).all()[0][0]
@@ -84,9 +100,9 @@ def signup():
                             f"'{request.form['state']}', '{request.form['zip_code']}')"))
         conn.commit()
         # except:
-            # return render_template("signup.html", error="Error")
+            # return render_template("signup.html", admin = admin, error="Error")
 
-        return render_template("signup.html", success="Success")
+        return render_template("signup.html", admin = admin, success="Success. Your account now needs accepted")
 
 # ---------------- #
 # -- LOGIN PAGE -- #
@@ -99,7 +115,7 @@ def login():
 
     elif request.method == "POST":
         username = request.form['username']
-        password = request.form['password']
+        password = customHash(request.form['password'])
         admin_username = dict( conn.execute(text("SELECT username, password FROM admin")).all() )
         users_username = dict( conn.execute(text("SELECT username, password FROM users")).all() )
         
@@ -130,6 +146,8 @@ def account():
     return render_template('account.html', accounts = users, address = address, phone = phoneNum)
 
 
+      
+      
 # ------------------ #
 # -- BALANCE PAGE -- #
 # ------------------ #
@@ -164,45 +182,87 @@ def update_balance():
 
     return redirect(url_for('balance'))
 
-# --------------------- #
-# -- SEND MONEY PAGE -- # 
-# --------------------- #
+# ----------------------- #
+# -- APPLICATIONS PAGE -- #
+# ----------------------- #
 
-@app.route('/send_money', methods=['GET', 'POST'])
-def send_money():
-    current = getCurrentUser()
-    balanceInfo = conn.execute(text('SELECT acc_num, balance FROM users WHERE username = :current'), {'current': current}).all()
-    balanceList = []
-    balanceDict = dict(balanceInfo)
-    for balance in balanceInfo:
-        balanceNum = realBalance(balance[1])
-        balanceList.append((balance[0], balanceNum))
-    allAccounts = conn.execute(text('SELECT acc_num FROM users;')).all()
-    print('balance list:', balanceList)
-    print('balance info:', balanceInfo)
-    print('balance dictionary:', balanceDict)
-    return render_template('send_money.html', accounts = allAccounts, balance = balanceList, balanceDict = balanceDict)
+@app.route("/applications", methods=["GET", "POST"])
+def applications():
+    appli_num_i, username_i, password_i = 0, 1, 2 
+    first_name_i, last_name_i, ssn_i, phone_num_i = 3, 4, 5, 6
+    applicationsDB = conn.execute(text("SELECT * FROM applications")).all()
 
-@app.route('/send_money_submit', methods=['POST', 'GET'])
-def send_money_submit():
-    fromAccount = request.form.get('accounts')
-    toAccount = request.form.get('toAccounts')
-    amountNum = request.form.get('sendAmount')
-    amount = round(float(amountNum), 2)
+    # Only runs this page with database if the user is an admin
+    if loggedIntoType() == 'admin':
+        if request.method == "GET":
+            return render_template("applications.html", appliDB = applicationsDB)
 
-    try:
-        amount *= 100
-        conn.execute(text('UPDATE users SET balance = balance + :amount WHERE acc_num = :to'), {'to': toAccount, 'amount': amount})
-        conn.execute(text('UPDATE users SET balance = balance - :amount WHERE acc_num = :from'), {'from': fromAccount, 'amount': amount})
-        conn.commit()
-    except Exception as e:
-        print('error updating balance:', e)
+        elif request.method == "POST" and 'appli_num' in request.form.keys():
+            print("Is admin. Accepting application")
+            appli_num = request.form['appli_num']
+            print(f"appli_num: {appli_num}")
 
-    return redirect(url_for('send_money'))
+            usersDB = conn.execute(text("SELECT acc_num, username FROM users")).all()
+            appli = conn.execute(text(
+                "SELECT * FROM applications "
+                f"WHERE appli_num = {appli_num}")).all()
+
+            if not appli:
+                return render_template("applications.html", appliDB = applicationsDB, error="Invalid application number")
+                
+            appli = appli[0]
+            appli_phone_num = appli[phone_num_i] if appli[phone_num_i] else "NULL"
+            
+            for user in usersDB:
+                if appli[username_i] == user[1]: # Shouldn't ever happen but who knows
+                    return render_template("applications.html", appliDB = applicationsDB, error="Username already exists")
+
+            if appli:
+                conn.execute(text(
+                    "INSERT INTO users "
+                    "   (username, password, "
+                    "    first_name, last_name, ssn, phone_num)"
+                    "VALUES"
+                    f"  ('{appli[username_i]}', '{appli[password_i]}', "
+                    f"'{appli[first_name_i]}', '{appli[last_name_i]}', '{appli[ssn_i]}', {appli_phone_num})"))
+                user_acc_num = conn.execute(text("SELECT acc_num FROM users "
+                                                f"WHERE username = '{appli[username_i]}'")).all()[0][0]
+                conn.execute(text(f"UPDATE addresses SET acc_num = {user_acc_num}, appli_num = NULL "
+                                  f"WHERE appli_num = {appli[appli_num_i]}"))
+                conn.execute(text(f"DELETE FROM applications WHERE appli_num = {appli[appli_num_i]}"))
+
+                conn.commit()
+                applicationsDB = conn.execute(text("SELECT * FROM applications")).all()
+            else: 
+                return render_template("applications.html", appliDB = applicationsDB, error="Invalid application number")
+
+            return render_template("applications.html", appliDB = applicationsDB, success="Successfully accepted user")
+        
+        elif request.method == "POST" and 'appli_num_delete' in request.form.keys():
+            print("Is admin. Denying application")
+            appli_num = request.form['appli_num_delete']
+            appli = conn.execute(text(
+                "SELECT * FROM applications "
+                f"WHERE appli_num = {appli_num}")).all()
+
+            if not appli:
+                return render_template("applications.html", appliDB = applicationsDB, error="Invalid application number")
+            appli = appli[0]
+
+            conn.execute(text(f"DELETE FROM addresses WHERE appli_num = {appli_num}"))
+            conn.execute(text(f"DELETE FROM applications WHERE appli_num = {appli_num}"))
+            conn.commit()
+            applicationsDB = conn.execute(text("SELECT * FROM applications")).all()
+             
+            return render_template("applications.html", appliDB = applicationsDB, success="Successfully denied user")
+
+    else: # Not logged in as an admin
+        print("Is not admin. :(")
+        return render_template("applications.html", error="Admin not logged in")
 
 
 # --------------- #
-# -- FUNCTIONS -- #
+# -- FUNCTIONS -- # 
 # --------------- #
 
 def logIntoDB(accType, username=None, password=None):                                    
@@ -221,8 +281,8 @@ def logIntoDB(accType, username=None, password=None):
             result = conn.execute(text( "SELECT admin_id FROM admin "
                                        f"WHERE username = '{username}' AND password = '{password}'")).all()
         elif accType == 'user':
-            result = conn.execute(text( "SELECT acc_num FROM users "
-                                       f"WHERE username = '{username}' AND password = '{password}'")).all()
+            result = conn.execute(text( "SELECT username FROM users "
+                                       f"WHERE password = '{password}'")).all()
 
         print(f"logIntoDB result variable = {result}")
         
@@ -232,33 +292,31 @@ def logIntoDB(accType, username=None, password=None):
         stored_id = result[0][0]                                                      
 
         conn.execute(                                                                 
-            text("UPDATE loggedin SET acc_num = :acc_num, admin_id = :admin_id"),
-                {'acc_num': stored_id if accType == 'user' else None,
+            text("UPDATE loggedin SET username = :username, admin_id = :admin_id"),
+                {'username': stored_id if accType == 'user' else None,
                 'admin_id': stored_id if accType == 'admin' else None}
         )                                             
         conn.commit()                                                                 
 
         return "Executed function logIntoDB fully"
 
-def loggedIntoType():                                                                    
-    """Returns either 'user', 'admin', or None"""
+def getCurrentUser():                                                                   # FUNCTION gets current user id
+    user = conn.execute(text('SELECT * FROM loggedin;')).all()                          # gets data from loggedin table
+
+    if loggedIntoType() == 'user':                                                      # if user type account
+        return user[0][0]                                                               # return acc_num
+    elif loggedIntoType() == 'admin':                                                   # elif admin type account
+        return user[0][1]                                                               # return admin_id
+
+def loggedIntoType():                                                                   # FUNCTION checks user type that is logged in 
     value = conn.execute(text("SELECT * FROM loggedin")).all()
     
-    if value[0][0]:                                                                      
-        return "user"                                                                
-    elif value[0][1]:                                                              
-        return "admin"                                                          
-    else:                                                                               
-        return None                                                                     
-
-def getCurrentUser():                                                                   
-    """Returns either the admin_id, acc_num, or None"""
-    user = conn.execute(text('SELECT * FROM loggedin;')).all()                          
-
-    if loggedIntoType() == 'user':                                               
-        return user[0][0]                                                               
-    elif loggedIntoType() == 'admin':                                             
-        return user[0][1]      
+    if value[0][0]:                                                                     # returns user type if 
+        return "user"                                                                   # acc_num is not null 
+    elif value[0][1]:                                                                   # returns admin type if
+        return "admin"                                                                  # admin_id is not null
+    else:                                                                               # else both are null and 
+        return None                                                                     # is therefore not signed in
 
 def realBalance(int):
     int = int / 100
