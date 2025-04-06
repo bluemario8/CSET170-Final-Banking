@@ -1,0 +1,62 @@
+<link rel="stylesheet" href="../static/styles/styles.css">
+<script src="https://kit.fontawesome.com/318fe15147.js" crossorigin="anonymous"></script>
+<script>
+    function getBalance(event){
+        let buttonClicked = event.currentTarget;
+        console.log(buttonClicked);
+        let balanceInput = buttonClicked.getAttribute('data-balance');
+        console.log(balanceInput)
+        document.getElementById('balance').value = balanceInput;
+        document.getElementById('moneyAmount').max = balanceInput;
+    }
+</script>
+{% extends 'base.html' %}
+{% block body %}
+    <section class="page">
+        <div class="pageBody">
+            <h2 class="title">Send money</h2>
+            <div class="sendContainer">
+                <form action="{{ url_for('send_money_submit') }}" method="POST" class="sendMoney">
+                    <table class="sendMoneyTable">
+                        <tr class="moneyRow">
+                            <th class="moneyHeader">Send from:</th>
+                            <th class="moneyHeader">Balance:</th>
+                        </tr>
+                        <tr class="moneyRow">
+                            <td class="moneyData">
+                                <div class="radio">
+                                    {% for b in balance %}
+                                    <div>
+                                        <label for="{{ b[0] }}">{{ b[0] }}</label>
+                                        <input type="radio" name="accounts" id="{{ b[0] }}" value="{{ b[0] }}" data-balance="{{ b[1] }}" onclick="getBalance(event)">
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </td>
+                            <td class="moneyData">
+                                <input type="text" name="accountBalance" id="balance" value="" readonly>
+                            </td>
+                        </tr>
+                        <tr class="moneyRow">
+                            <th class="moneyHeader">Send to:</th>
+                            <th class="moneyHeader">Amount $:</th>
+                        </tr>
+                        <tr class="moneyRow">
+                            <td class="moneyData">
+                                <select name="toAccounts" id="toAccounts">
+                                    {% for account in accounts %}
+                                        <option value="{{ account[0] }}">{{ account[0] }}</option>
+                                    {% endfor %}
+                                </select>  
+                            </td>
+                            <td class="moneyData">
+                                <input type="text" inputmode="numeric" pattern="^\d+(\.\d{1,2})?$" name="sendAmount" id="moneyAmount">
+                            </td>
+                        </tr>
+                    </table>
+                    <input type="submit" id="submitSend">
+                </form>
+            </div>
+        </div>
+    </section>
+{% endblock %}

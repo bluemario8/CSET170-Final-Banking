@@ -163,6 +163,46 @@ def update_balance():
 
     return redirect(url_for('balance'))
 
+# --------------------- #
+# -- SEND MONEY PAGE -- # 
+# --------------------- #
+
+@app.route('/send_money', methods=['GET', 'POST'])
+def send_money():
+    current = getCurrentUser()
+    balanceInfo = conn.execute(text('SELECT acc_num, balance FROM users WHERE username = :current'), {'current': current}).all()
+    balanceList = []
+    balanceDict = dict(balanceInfo)
+    for balance in balanceInfo:
+        balanceNum = realBalance(balance[1])
+        balanceList.append((balance[0], balanceNum))
+    allAccounts = conn.execute(text('SELECT acc_num FROM users;')).all()
+    print('balance list:', balanceList)
+    print('balance info:', balanceInfo)
+    print('balance dictionary:', balanceDict)
+    return render_template('send_money.html', accounts = allAccounts, balance = balanceList, balanceDict = balanceDict)
+
+@app.route('/send_money_submit', methods=['POST', 'GET'])
+def send_money_submit():
+    fromAccount = request.form.get('accounts')
+    toAccount = request.form.get('toAccounts')
+    amountNum = request.form.get('sendAmount')
+    amount = round(float(amountNum), 2)
+
+    try:
+        amount *= 100
+        conn.execute(text('UPDATE users SET balance = balance + :amount WHERE acc_num = :to'), {'to': toAccount, 'amount': amount})
+        conn.execute(text('UPDATE users SET balance = balance - :amount WHERE acc_num = :from'), {'from': fromAccount, 'amount': amount})
+        conn.commit()
+    except Exception as e:
+        print('error updating balance:', e)
+
+    return redirect(url_for('send_money'))
+
+
+# --------------- #
+# -- FUNCTIONS -- #
+# --------------- #
 
 def logIntoDB(accType, username=None, password=None):                                    
         """
