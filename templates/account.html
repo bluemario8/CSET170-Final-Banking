@@ -11,27 +11,21 @@
                     <th class="accountHeader">Name</th>
                     <th class="accountHeader">Username</th>
                 </tr>
+                {% for account in accounts %}
                 <tr class= "accounts tableRow">
-                    <td class="accountData">{{ accounts[0] }}</td>
-                    <td class="accountData">{{ accounts[1] }}</td>
-                    <td class="accountData">{{ accounts[2] }}</td>
+                    <td class="accountData">{{ account[0] }}</td>
+                    <td class="accountData">{{ account[1] }}</td>
+                    <td class="accountData">{{ account[2] }}</td>
                 </tr>
-            </table>
-            <table class="accountTable contact">
-                <tr class="tableRow">
-                    <th class="accountHeader">Email</th>
-                    <th class="accountHeader">Phone number</th>
-                </tr>
-                <tr class="tableRow">
-                    <td class="accountData">Email here</td>
-                    <td class="accountData">{{ accounts[3] }}</td>
-                </tr>
+                {% endfor %}
             </table>
             <table class="accountTable address">
                 <tr>
+                    <th class="accountHeader">Phone number</th>
                     <th class="accountHeader">Address</th>
                 </tr>
                 <tr>
+                    <td class="accountData">{{ phone }}</td>
                     <td class="accountData">{{ address[0] }}</td>
                 </tr>
             </table>

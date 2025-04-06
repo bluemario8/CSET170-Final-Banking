@@ -121,12 +121,13 @@ def login():
 @app.route('/account', methods=['GET'])
 def account():
     current = getCurrentUser()
-    users = list(conn.execute(text('SELECT acc_num, CONCAT(first_name, " ", last_name), username, phone_num FROM users WHERE username = :current;'), {'current': current}).fetchone())
+    users = list(conn.execute(text('SELECT acc_num, CONCAT(first_name, " ", last_name), username, phone_num FROM users WHERE username = :current;'), {'current': current}).all())
     address = list(conn.execute(text('SELECT CONCAT(street_addr, ", ", city, ", ", state, " ", zip_code) FROM addresses WHERE username = :current;'), {'current': current}).fetchone())
+    phoneNum = formatPhoneNum(users[0][3])
     print(current)
     print(users)
     print(address)
-    return render_template('account.html', accounts = users, address = address)
+    return render_template('account.html', accounts = users, address = address, phone = phoneNum)
 
 
 # ------------------ #
@@ -263,7 +264,10 @@ def realBalance(int):
     int = int / 100
     number = '{:.{}f}'.format(int, 2)  
     print('the number:', float(number))
-    return float(number)                                                      
+    return float(number)
+
+def formatPhoneNum(num):
+    return f'({num[:3]}) {num[3:6]}-{num[6:]}'                                                      
 
 
 if __name__ == "__main__":
