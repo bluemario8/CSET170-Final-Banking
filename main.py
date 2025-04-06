@@ -37,24 +37,9 @@ def home():
     return render_template('index.html')
 
 
-# ------------------ #
-# ------------------ #
-
-@app.route('/account', methods=['GET'])
-def account():
-    current = getCurrentUser()
-    users = list(conn.execute(text('SELECT acc_num, CONCAT(first_name, " ", last_name), username, phone_num FROM users WHERE username = :current;'), {'current': current}).fetchone())
-    acc_num = users[0]
-    print("acc_num")
-    print(acc_num)
-    address = list(conn.execute(text('SELECT CONCAT(street_addr, ", ", city, ", ", state, " ", zip_code) FROM addresses WHERE acc_num = :current;'), {'current': acc_num}).fetchone())
-    print(current)
-    print(users)
-    print(address)
-    return render_template('account.html', accounts = users, address = address)
-
 # ----------------- #
 # -- SIGNUP PAGE -- #
+# ----------------- #
 
 @app.route('/signup', methods=["GET", "POST"])
 def signup():
@@ -104,6 +89,7 @@ def signup():
 
         return render_template("signup.html", admin = admin, success="Success. Your account now needs accepted")
 
+
 # ---------------- #
 # -- LOGIN PAGE -- #
 # ---------------- #
@@ -130,6 +116,22 @@ def login():
         return render_template("login.html", success="Login success")
       
       
+# ------------------ #
+# -- ACCOUNT PAGE -- #
+# ------------------ #
+
+@app.route('/account', methods=['GET'])
+def account():
+    current = getCurrentUser()
+    users = list(conn.execute(text('SELECT acc_num, CONCAT(first_name, " ", last_name), username, phone_num FROM users WHERE username = :current;'), {'current': current}).all())
+    address = list(conn.execute(text('SELECT CONCAT(street_addr, ", ", city, ", ", state, " ", zip_code) FROM addresses WHERE username = :current;'), {'current': current}).fetchone())
+    phoneNum = formatPhoneNum(users[0][3])
+    print(current)
+    print(users)
+    print(address)
+    return render_template('account.html', accounts = users, address = address, phone = phoneNum)
+
+
 # ------------------ #
 # -- BALANCE PAGE -- #
 # ------------------ #
@@ -163,6 +165,44 @@ def update_balance():
         print('error updating balance:', e)
 
     return redirect(url_for('balance'))
+
+
+# ---------------- #
+# -- SEND MONEY -- #
+# ---------------- #
+
+@app.route('/send_money', methods=['GET', 'POST'])
+def send_money():
+    current = getCurrentUser()
+    balanceInfo = conn.execute(
+        text('SELECT acc_num, balance FROM users WHERE username = :current'), 
+        {'current': current}).all()
+    balanceList = []
+    balanceDict = dict(balanceInfo)
+    for balance in balanceInfo:
+        balanceNum = realBalance(balance[1])
+        balanceList.append((balance[0], balanceNum))
+    allAccounts = conn.execute(text('SELECT acc_num FROM users;')).all()
+    print('balance list:', balanceList)
+    print('balance info:', balanceInfo)
+    print('balance dictionary:', balanceDict)
+    return render_template('send_money.html', accounts = allAccounts, balance = balanceList, balanceDict = balanceDict)
+
+@app.route('/send_money_submit', methods=['POST', 'GET'])
+def send_money_submit():
+    fromAccount = request.form.get('accounts')
+    toAccount = request.form.get('toAccounts')
+    amountNum = request.form.get('sendAmount')
+    amount = round(float(amountNum), 2)
+    try:
+        amount *= 100
+        conn.execute(text('UPDATE users SET balance = balance + :amount WHERE acc_num = :to'), {'to': toAccount, 'amount': amount})
+        conn.execute(text('UPDATE users SET balance = balance - :amount WHERE acc_num = :from'), {'from': fromAccount, 'amount': amount})
+        conn.commit()
+    except Exception as e:
+        print('error updating balance:', e)
+    return redirect(url_for('send_money'))
+
 
 # ----------------------- #
 # -- APPLICATIONS PAGE -- #
@@ -246,46 +286,6 @@ def applications():
 # --------------- #
 # -- FUNCTIONS -- # 
 # --------------- #
-# --------------------- #
-# -- SEND MONEY PAGE -- # 
-# --------------------- #
-
-@app.route('/send_money', methods=['GET', 'POST'])
-def send_money():
-    current = getCurrentUser()
-    balanceInfo = conn.execute(text('SELECT acc_num, balance FROM users WHERE username = :current'), {'current': current}).all()
-    balanceList = []
-    balanceDict = dict(balanceInfo)
-    for balance in balanceInfo:
-        balanceNum = realBalance(balance[1])
-        balanceList.append((balance[0], balanceNum))
-    allAccounts = conn.execute(text('SELECT acc_num FROM users;')).all()
-    print('balance list:', balanceList)
-    print('balance info:', balanceInfo)
-    print('balance dictionary:', balanceDict)
-    return render_template('send_money.html', accounts = allAccounts, balance = balanceList, balanceDict = balanceDict)
-
-@app.route('/send_money_submit', methods=['POST', 'GET'])
-def send_money_submit():
-    fromAccount = request.form.get('accounts')
-    toAccount = request.form.get('toAccounts')
-    amountNum = request.form.get('sendAmount')
-    amount = round(float(amountNum), 2)
-
-    try:
-        amount *= 100
-        conn.execute(text('UPDATE users SET balance = balance + :amount WHERE acc_num = :to'), {'to': toAccount, 'amount': amount})
-        conn.execute(text('UPDATE users SET balance = balance - :amount WHERE acc_num = :from'), {'from': fromAccount, 'amount': amount})
-        conn.commit()
-    except Exception as e:
-        print('error updating balance:', e)
-
-    return redirect(url_for('send_money'))
-
-
-# --------------- #
-# -- FUNCTIONS -- #
-# --------------- #
 
 def logIntoDB(accType, username=None, password=None):                                    
         """
@@ -342,7 +342,12 @@ def loggedIntoType():                                                           
 
 def realBalance(int):
     int = int / 100
-    return '{:.{}f}'.format(int, 2)                                                         
+    number = '{:.{}f}'.format(int, 2)  
+    print('the number:', float(number))
+    return float(number)
+
+def formatPhoneNum(num):
+    return f'({num[:3]}) {num[3:6]}-{num[6:]}'                                                      
 
 
 if __name__ == "__main__":
