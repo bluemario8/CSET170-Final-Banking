@@ -127,7 +127,10 @@ def account():
     current = getCurrentUser()
     users = list(conn.execute(text('SELECT acc_num, CONCAT(first_name, " ", last_name), username, phone_num FROM users WHERE username = :current;'), {'current': current}).all())
     address = list(conn.execute(text('SELECT CONCAT(street_addr, ", ", city, ", ", state, " ", zip_code) FROM addresses WHERE username = :current;'), {'current': current}).fetchone())
-    phoneNum = formatPhoneNum(users[0][3])
+    if users[0][3]:
+        phoneNum = formatPhoneNum(users[0][3])
+    else:
+        phoneNum = ''
     print(current)
     print(users)
     print(address)
@@ -140,7 +143,7 @@ def account():
                                               f"FROM users WHERE username = '{current}'")).all()[0]
         
         conn.execute(text("INSERT INTO users (username, password, first_name, last_name, ssn, phone_num) "
-                          f"VALUES ('{u_info[0]}', '{u_info[1]}', '{u_info[2]}', '{u_info[3]}', '{u_info[4]}', {u_info[5]})"))
+                          f"VALUES ('{u_info[0]}', '{u_info[1]}', '{u_info[2]}', '{u_info[3]}', '{u_info[4]}', {u_info[5] if u_info[5] else 'NULL'})"))
         conn.commit()
         users = list(conn.execute(text('SELECT acc_num, CONCAT(first_name, " ", last_name), username, phone_num FROM users WHERE username = :current;'), {'current': current}).all())
 
@@ -278,8 +281,10 @@ def applications():
                     f"'{appli[first_name_i]}', '{appli[last_name_i]}', '{appli[ssn_i]}', {appli_phone_num})"))
                 user_acc_num = conn.execute(text("SELECT acc_num FROM users "
                                                 f"WHERE username = '{appli[username_i]}'")).all()[0][0]
-                conn.execute(text(f"UPDATE addresses SET acc_num = {user_acc_num}, appli_num = NULL "
+                conn.execute(text(f"UPDATE addresses SET username = '{appli[username_i]}', appli_num = NULL "
                                   f"WHERE appli_num = {appli[appli_num_i]}"))
+                print(f"UPDATE addresses SET username = '{appli[username_i]}', appli_num = NULL "
+                                  f"WHERE appli_num = {appli[appli_num_i]}")
                 conn.execute(text(f"DELETE FROM applications WHERE appli_num = {appli[appli_num_i]}"))
 
                 conn.commit()
