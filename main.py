@@ -288,8 +288,8 @@ def statements():
             transactions.append({
                 'acc_num': row[1],
                 'type': row[2],
-                'amount': realBalance(row[3]),
-                'other_party': row[4],
+                'amount': realBalance(row[4]),
+                'other_party': row[3],
                 'description': row[5],
                 'timestamp': row[6]
             })
