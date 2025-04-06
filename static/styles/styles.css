@@ -8,6 +8,10 @@ body{
     background-color: var(--color-white);
 }
 
+.flex {
+    display: flex;
+}
+
 .page{
     background-image: linear-gradient(#112250b3, #11225059), url(https://imageio.forbes.com/specials-images/imageserve/60eda0efdccb85252c59d7a9/0x0.jpg?format=jpg&height=900&width=1600&fit=bounds);
     background-size: contain;
@@ -105,6 +109,12 @@ td.accountData{
 .contact,
 .address{
     margin-top: 25px;
+}
+
+.acc-new-btn {
+    font-size: 1.3rem;
+    margin: 0 auto;
+    margin-top: 2rem;
 }
 
 

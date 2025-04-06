@@ -120,7 +120,7 @@ def login():
 # -- ACCOUNT PAGE -- #
 # ------------------ #
 
-@app.route('/account', methods=['GET'])
+@app.route('/account', methods=['GET', "POST"])
 def account():
     current = getCurrentUser()
     users = list(conn.execute(text('SELECT acc_num, CONCAT(first_name, " ", last_name), username, phone_num FROM users WHERE username = :current;'), {'current': current}).all())
@@ -129,7 +129,22 @@ def account():
     print(current)
     print(users)
     print(address)
-    return render_template('account.html', accounts = users, address = address, phone = phoneNum)
+
+    if request.method == "GET":
+        return render_template('account.html', accounts = users, address = address, phone = phoneNum)
+    
+    elif request.method == "POST":
+        u_info = conn.execute(text("SELECT username, password, first_name, last_name, ssn, phone_num "
+                                              f"FROM users WHERE username = '{current}'")).all()[0]
+        
+        conn.execute(text("INSERT INTO users (username, password, first_name, last_name, ssn, phone_num) "
+                          f"VALUES ('{u_info[0]}', '{u_info[1]}', '{u_info[2]}', '{u_info[3]}', '{u_info[4]}', {u_info[5]})"))
+        conn.commit()
+        users = list(conn.execute(text('SELECT acc_num, CONCAT(first_name, " ", last_name), username, phone_num FROM users WHERE username = :current;'), {'current': current}).all())
+
+        return render_template('account.html', accounts = users, address = address, phone = phoneNum)
+
+
 
 
 # ------------------ #
