@@ -8,6 +8,8 @@ SELECT * FROM loggedin;
 DESC applications;
 DESC addresses;
 
+UPDATE loggedin SET username = NULL WHERE username = 'ddzidzic';
+
 INSERT INTO applications     
 	(username, password, first_name, last_name, ssn, phone_num)
 VALUES ('newaccccccccc', 'newacc', 'New',  'Account', '123456789', 7177896789);
