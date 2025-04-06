@@ -261,7 +261,9 @@ def getCurrentUser():
 
 def realBalance(int):
     int = int / 100
-    return '{:.{}f}'.format(int, 2)                                                         
+    number = '{:.{}f}'.format(int, 2)  
+    print('the number:', float(number))
+    return float(number)                                                      
 
 
 if __name__ == "__main__":
